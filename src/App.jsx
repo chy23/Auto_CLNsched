@@ -49,8 +49,6 @@ function App() {
   }, [schedule]);
 
   const generateSchedule = () => {
-    const newSchedule = [];
-    
     // 1. Identify all chiefs and deputies
     const chiefs = areas.map(a => a.chief).filter(id => id);
     const deputies = areas.map(a => ({ areaName: a.name, studentId: a.deputy })).filter(d => d.studentId);
@@ -80,78 +78,76 @@ function App() {
       return 0;
     });
 
-    let success = true;
+    // Create a mutable task state
+    const taskState = sortedTasks.map(t => ({ ...t, assignedStudents: [], remaining: parseInt(t.count, 10) }));
 
-    for (const task of sortedTasks) {
-      const assigned = [];
-      let needed = parseInt(task.count, 10);
-      
-      // 2. Check if we have a deputy for this area who hasn't been assigned yet
+    // 2. Assign Deputies first
+    for (const task of taskState) {
       const areaDeputies = deputies.filter(d => d.areaName === task.area);
-      
       for (const dep of areaDeputies) {
-        // If we still need people for this task and the deputy is still in available pool
-        if (needed > 0) {
+        if (task.remaining > 0) {
           const depStudentIndex = availableStudents.findIndex(s => String(s.id) === String(dep.studentId));
           if (depStudentIndex !== -1) {
             const depStudent = availableStudents[depStudentIndex];
-            // Check gender constraint
             if ((task.genderReq === '限男生' && depStudent.gender !== '男') || 
                 (task.genderReq === '限女生' && depStudent.gender !== '女')) {
-              // Cannot assign this deputy to this specific task due to gender. Skip.
+              // skip
             } else {
-              // Assign deputy
-              assigned.push(depStudent);
+              task.assignedStudents.push(depStudent);
               availableStudents.splice(depStudentIndex, 1);
-              needed--;
+              task.remaining--;
             }
           }
         }
       }
+    }
 
-      // 3. Fill remaining slots with random students
-      for (let i = 0; i < needed; i++) {
-        const validCandidates = availableStudents.filter(s => {
-          if (task.genderReq === '限男生' && s.gender !== '男') return false;
-          if (task.genderReq === '限女生' && s.gender !== '女') return false;
-          return true;
-        });
+    // 3. Form pools: Early, Normal, Late
+    const earlyPool = availableStudents.filter(s => s.arrival === '早到').sort(() => Math.random() - 0.5);
+    const normalPool = availableStudents.filter(s => !s.arrival || s.arrival === '正常').sort(() => Math.random() - 0.5);
+    const latePool = availableStudents.filter(s => s.arrival === '晚到').sort(() => Math.random() - 0.5);
 
-        if (validCandidates.length === 0) {
-          success = false;
-          break;
+    const pools = [earlyPool, normalPool, latePool];
+
+    for (const pool of pools) {
+      let madeAssignment = true;
+      // Round-robin loop: assign 1 student per task per pass until pool is empty or no valid assignments can be made
+      while (madeAssignment && pool.length > 0) {
+        madeAssignment = false;
+        
+        // Loop over tasks by area alternating to ensure even distribution across areas?
+        // Since taskState is likely grouped by area implicitly, looping it distributes 1 per task. 
+        // This distributes them evenly across all tasks!
+        for (const task of taskState) {
+          if (task.remaining > 0 && pool.length > 0) {
+            const candidateIndex = pool.findIndex(s => {
+              if (task.genderReq === '限男生' && s.gender !== '男') return false;
+              if (task.genderReq === '限女生' && s.gender !== '女') return false;
+              return true;
+            });
+
+            if (candidateIndex !== -1) {
+              const selected = pool[candidateIndex];
+              task.assignedStudents.push(selected);
+              pool.splice(candidateIndex, 1);
+              task.remaining--;
+              madeAssignment = true;
+            }
+          }
         }
-
-        const randomIndex = Math.floor(Math.random() * validCandidates.length);
-        const selected = validCandidates[randomIndex];
-
-        assigned.push(selected);
-        availableStudents = availableStudents.filter(s => s.id !== selected.id);
       }
-      
-      if (!success) break;
-
-      newSchedule.push({
-        ...task,
-        assignedStudents: assigned
-      });
     }
 
-    if (!success) {
+    // Check if all tasks are filled
+    const unfilledTasks = taskState.filter(t => t.remaining > 0);
+    if (unfilledTasks.length > 0) {
       alert('排班失敗：學生人數不足或無法滿足性別條件。請檢查您的名單與工作設定。');
-      return;
-    }
-
-    // Check if any deputies were left unassigned (e.g. gender mismatch for all tasks in their area)
-    const unassignedDeputies = deputies.filter(d => availableStudents.some(s => String(s.id) === String(d.studentId)));
-    if (unassignedDeputies.length > 0) {
-      alert('警告：有代理股長無法被排入所屬區域的工作中（可能因為該區工作性別限制與代理股長性別不符，或是該區總人數需求不足）。');
       return;
     }
 
     setSchedule({
       date: new Date().toLocaleDateString(),
-      assignments: newSchedule,
+      assignments: taskState,
       areasInfo: areasInfo
     });
     

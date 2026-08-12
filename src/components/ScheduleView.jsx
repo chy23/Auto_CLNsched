@@ -1,3 +1,5 @@
+import * as XLSX from 'xlsx';
+
 function ScheduleView({ schedule }) {
   if (!schedule) {
     return (
@@ -15,11 +17,40 @@ function ScheduleView({ schedule }) {
     return acc;
   }, {});
 
+  const exportToExcel = () => {
+    const data = [];
+    data.push(['掃區', '打掃範圍', '人數', '負責同學']);
+    
+    Object.keys(groupedTasks).forEach(area => {
+      const areaInfo = schedule.areasInfo ? schedule.areasInfo[area] : null;
+      let areaText = area;
+      if (areaInfo && areaInfo.chiefName) areaText += ` (股長:${areaInfo.chiefName})`;
+      if (areaInfo && areaInfo.deputyName) areaText += ` (代理:${areaInfo.deputyName})`;
+      
+      groupedTasks[area].forEach((task, index) => {
+        data.push([
+          index === 0 ? areaText : '',
+          task.name,
+          task.count,
+          task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , ')
+        ]);
+      });
+    });
+    
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "總排班表");
+    XLSX.writeFile(wb, `打掃總排班表_${schedule.date.replace(/\//g, '-')}.xlsx`);
+  };
+
   return (
     <div className="glass-card animate-fade-in" style={{ backgroundColor: 'white' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }} className="no-print">
         <h2 style={{ color: 'var(--primary-color)', margin: 0 }}>📅 掃地工作表 ({schedule.date})</h2>
-        <button className="btn btn-secondary" onClick={() => window.print()}>🖨️ 列印工作表</button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn btn-secondary" onClick={exportToExcel}>📊 匯出總表 (Excel)</button>
+          <button className="btn btn-secondary" onClick={() => window.print()}>🖨️ 列印總表</button>
+        </div>
       </div>
 
       <div className="print-header" style={{ display: 'none', textAlign: 'center', marginBottom: '1rem' }}>

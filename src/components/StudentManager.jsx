@@ -10,14 +10,19 @@ function StudentManager({ students, setStudents }) {
     const no = e.target.no.value;
     const name = e.target.name.value;
     const gender = e.target.gender.value;
+    const arrival = e.target.arrival.value;
     if (no && name && gender) {
-      setStudents([...students, { id: Date.now(), no, name, gender }]);
+      setStudents([...students, { id: Date.now(), no, name, gender, arrival }]);
       e.target.reset();
     }
   };
 
   const handleRemove = (id) => {
     setStudents(students.filter(s => s.id !== id));
+  };
+
+  const updateArrival = (id, newArrival) => {
+    setStudents(students.map(s => s.id === id ? { ...s, arrival: newArrival } : s));
   };
 
   const handleBulkImport = () => {
@@ -30,7 +35,8 @@ function StudentManager({ students, setStudents }) {
           id: Date.now() + Math.random(),
           no: parts[0],
           name: parts[1],
-          gender: parts[2]
+          gender: parts[2],
+          arrival: parts[3] || '正常'
         });
       }
     });
@@ -40,7 +46,7 @@ function StudentManager({ students, setStudents }) {
       setInputData('');
       alert(`成功匯入 ${newStudents.length} 筆資料`);
     } else {
-      alert('無法解析格式，請確認格式為：座號 姓名 性別（中間以空白或逗號分隔）');
+      alert('無法解析格式，請確認格式為：座號 姓名 性別 [到校時間]');
     }
   };
 
@@ -58,7 +64,6 @@ function StudentManager({ students, setStudents }) {
         const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
         
         const newStudents = [];
-        // Skip header row if it contains text like "座號"
         let startIndex = 0;
         if (data[0] && (data[0][0] === '座號' || data[0][1] === '姓名')) {
           startIndex = 1;
@@ -71,7 +76,8 @@ function StudentManager({ students, setStudents }) {
               id: Date.now() + Math.random(),
               no: String(row[0]),
               name: String(row[1]),
-              gender: String(row[2]).trim()
+              gender: String(row[2]).trim(),
+              arrival: row[3] ? String(row[3]).trim() : '正常'
             });
           }
         }
@@ -85,7 +91,6 @@ function StudentManager({ students, setStudents }) {
       } catch (err) {
         alert('解析 Excel 失敗，請確認檔案格式是否正確。');
       }
-      // reset file input
       if (fileInputRef.current) fileInputRef.current.value = '';
     };
     reader.readAsBinaryString(file);
@@ -111,11 +116,11 @@ function StudentManager({ students, setStudents }) {
           </label>
         </div>
 
-        <h5 style={{ margin: '0.5rem 0', color: 'var(--text-muted)' }}>或手動貼上 (座號 姓名 性別)：</h5>
+        <h5 style={{ margin: '0.5rem 0', color: 'var(--text-muted)' }}>或手動貼上 (座號 姓名 性別 [到校時間])：</h5>
         <textarea 
           className="form-control" 
           rows="3" 
-          placeholder={`範例：\n1 王大明 男\n2 陳小華 女`}
+          placeholder={`範例：\n1 王大明 男 早到\n2 陳小華 女 正常\n3 林小美 女 晚到`}
           value={inputData}
           onChange={(e) => setInputData(e.target.value)}
           style={{ marginBottom: '0.5rem' }}
@@ -125,11 +130,16 @@ function StudentManager({ students, setStudents }) {
 
       <div style={{ marginBottom: '1.5rem' }}>
         <form onSubmit={handleAddRow} style={{ display: 'flex', gap: '0.5rem' }}>
-          <input name="no" className="form-control" type="number" placeholder="座號" required style={{ width: '80px' }} />
-          <input name="name" className="form-control" type="text" placeholder="姓名" required />
-          <select name="gender" className="form-control" required style={{ width: '80px' }}>
+          <input name="no" className="form-control" type="number" placeholder="座號" required style={{ width: '60px' }} />
+          <input name="name" className="form-control" type="text" placeholder="姓名" required style={{ flex: 1 }} />
+          <select name="gender" className="form-control" required style={{ width: '60px' }}>
             <option value="男">男</option>
             <option value="女">女</option>
+          </select>
+          <select name="arrival" className="form-control" required style={{ width: '80px' }}>
+            <option value="正常">正常</option>
+            <option value="早到">早到</option>
+            <option value="晚到">晚到</option>
           </select>
           <button type="submit" className="btn btn-primary">+</button>
         </form>
@@ -149,6 +159,7 @@ function StudentManager({ students, setStudents }) {
               <th>座號</th>
               <th>姓名</th>
               <th>性別</th>
+              <th>到校時間</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -159,13 +170,24 @@ function StudentManager({ students, setStudents }) {
                 <td>{s.name}</td>
                 <td>{s.gender}</td>
                 <td>
+                  <select 
+                    value={s.arrival || '正常'} 
+                    onChange={(e) => updateArrival(s.id, e.target.value)}
+                    style={{ padding: '0.2rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                  >
+                    <option value="正常">正常</option>
+                    <option value="早到">早到</option>
+                    <option value="晚到">晚到</option>
+                  </select>
+                </td>
+                <td>
                   <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem' }} onClick={() => handleRemove(s.id)}>刪</button>
                 </td>
               </tr>
             ))}
             {students.length === 0 && (
               <tr>
-                <td colSpan="4" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>尚無學生資料</td>
+                <td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>尚無學生資料</td>
               </tr>
             )}
           </tbody>

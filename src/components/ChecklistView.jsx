@@ -1,3 +1,5 @@
+import * as XLSX from 'xlsx';
+
 function ChecklistView({ schedule }) {
   if (!schedule) {
     return (
@@ -11,11 +13,36 @@ function ChecklistView({ schedule }) {
   // Create columns for dates (empty columns for the checklist)
   const columns = Array.from({ length: 10 }, (_, i) => i + 1);
 
+  const exportToExcel = () => {
+    const data = [];
+    
+    // Header
+    const headerRow = ['打掃範圍', '姓名', ...columns.map(c => '')];
+    data.push(headerRow);
+    
+    // Data rows
+    schedule.assignments.forEach((task, index) => {
+      data.push([
+        `${index + 1}. ${task.name}`,
+        task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , '),
+        ...columns.map(c => '')
+      ]);
+    });
+    
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "檢核表");
+    XLSX.writeFile(wb, `掃地工作檢核表_${schedule.date.replace(/\//g, '-')}.xlsx`);
+  };
+
   return (
     <div className="glass-card animate-fade-in" style={{ backgroundColor: 'white' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }} className="no-print">
         <h2 style={{ color: 'var(--secondary-color)', margin: 0 }}>✅ 掃地工作檢核表</h2>
-        <button className="btn btn-secondary" onClick={() => window.print()}>🖨️ 列印檢核表</button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn btn-secondary" onClick={exportToExcel}>📊 匯出檢核表 (Excel)</button>
+          <button className="btn btn-secondary" onClick={() => window.print()}>🖨️ 列印檢核表</button>
+        </div>
       </div>
 
       <div style={{ pageBreakInside: 'avoid' }}>
