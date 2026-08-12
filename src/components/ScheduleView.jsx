@@ -1,3 +1,4 @@
+import React from 'react';
 import * as XLSX from 'xlsx-js-style';
 
 function ScheduleView({ schedule, setSchedule, students, settings }) {
@@ -278,7 +279,7 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
         </div>
       )}
 
-      <div className="print-header" style={{ display: 'none', textAlign: 'center', marginBottom: '1rem' }}>
+      <div className="print-header no-print" style={{ textAlign: 'center', marginBottom: '1rem' }}>
         <h2>
           {[
             settings.year ? `${settings.year}學年度` : '', 
@@ -292,8 +293,30 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
       </div>
 
       <div className="table-container" style={{ boxShadow: 'none', border: '1px solid #e5e7eb' }}>
-        <table className="table" style={{ borderCollapse: 'collapse' }}>
-          <thead>
+        <table className="table print-table" style={{ borderCollapse: 'collapse', width: '100%' }}>
+          <thead className="print-only" style={{ display: 'none' }}>
+            <tr>
+              <th colSpan="4" style={{ textAlign: 'center', fontSize: '1.5rem', border: '1px solid black', padding: '10px' }}>
+                {[
+                  settings.year ? `${settings.year}學年度` : '', 
+                  settings.semester || '上學期', 
+                  settings.school, 
+                  (settings.grade && settings.classNo) ? `${settings.grade}年${settings.classNo}班` : 
+                    (settings.grade ? `${settings.grade}年級` : (settings.classNo ? `${settings.classNo}班` : '')),
+                  '掃地工作表'
+                ].filter(Boolean).join(' ')}
+              </th>
+            </tr>
+            <tr>
+              <th style={{ border: '1px solid black' }}></th>
+              <th style={{ border: '1px solid black' }}></th>
+              <th style={{ border: '1px solid black', textAlign: 'center' }}>人數</th>
+              <th style={{ border: '1px solid black', textAlign: 'left', whiteSpace: 'pre-wrap', fontWeight: 'normal', fontSize: '0.85rem' }}>
+                {settings.scheduleRules}
+              </th>
+            </tr>
+          </thead>
+          <thead className="screen-only">
             <tr style={{ backgroundColor: '#f9fafb' }}>
               <th style={{ width: '15%', borderRight: '1px solid #e5e7eb' }}>掃區</th>
               <th style={{ width: '35%' }}>打掃範圍</th>
@@ -302,97 +325,128 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
             </tr>
           </thead>
           <tbody>
-            {Object.keys(groupedTasks).map((area, areaIndex) => (
-              groupedTasks[area].map((task, index) => {
-                const areaInfo = schedule.areasInfo ? schedule.areasInfo[area] : null;
-                return (
-                  <tr key={task.id}>
-                    {index === 0 && (
-                      <td 
-                        rowSpan={groupedTasks[area].length} 
-                        style={{ 
-                          borderRight: '1px solid #e5e7eb', 
-                          borderBottom: '1px solid #e5e7eb',
-                          verticalAlign: 'top', 
-                          textAlign: 'center',
-                          backgroundColor: areaIndex % 2 === 0 ? '#e0f2fe' : '#fce7f3',
-                          padding: '1rem 0.5rem'
-                        }}
-                      >
-                        <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{area}</div>
-                        {areaInfo && areaInfo.chiefName && (
-                          <div style={{ fontSize: '0.85rem', color: 'var(--primary-color)', marginBottom: '0.2rem' }}>
-                            <span style={{ border: '1px solid currentColor', borderRadius: '4px', padding: '0 2px', marginRight: '4px' }}>股長</span>
-                            {areaInfo.chiefName}
-                          </div>
-                        )}
-                        {areaInfo && areaInfo.deputyName && (
-                          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            <span style={{ border: '1px solid currentColor', borderRadius: '4px', padding: '0 2px', marginRight: '4px' }}>代理</span>
-                            {areaInfo.deputyName}
-                          </div>
-                        )}
-                      </td>
-                    )}
-                    <td style={{ borderBottom: '1px solid #e5e7eb' }}>{task.name}</td>
-                    <td style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>{task.count}</td>
-                    <td style={{ borderBottom: '1px solid #e5e7eb' }}>
-                      <div 
-                        style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', minHeight: '30px' }}
-                        onDragOver={onDragOver}
-                        onDrop={(e) => onDropToTask(e, task.id)}
-                      >
-                        {task.assignedStudents.map(s => (
-                          <div 
-                            key={s.id} 
-                            className="student-chip" 
-                            draggable
-                            onDragStart={(e) => onDragStart(e, s.id, task.id)}
-                            style={{ 
-                              display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f6', 
-                              padding: '0.2rem 0.5rem', borderRadius: '12px', fontSize: '0.9rem', 
-                              border: '1px solid #e5e7eb', cursor: 'grab'
-                            }}
-                          >
-                            <span>{s.no}{s.name}</span>
-                            <button 
-                              className="no-print"
-                              onClick={() => handleRemoveStudent(task.id, s.id)}
-                              style={{ 
-                                background: 'transparent', border: 'none', color: '#ef4444', 
-                                marginLeft: '0.3rem', cursor: 'pointer', fontWeight: 'bold', padding: '0 0.2rem'
-                              }}
-                              title="移除"
-                            >×</button>
-                          </div>
-                        ))}
-                        <select 
-                          className="no-print form-control" 
-                          style={{ width: 'auto', padding: '0.1rem 0.5rem', fontSize: '0.85rem', borderRadius: '12px', borderColor: '#d1d5db' }}
-                          onChange={(e) => handleAddStudent(task.id, e)}
-                          value=""
+            {Object.keys(groupedTasks).map((area, areaIndex) => {
+              const tasksInArea = groupedTasks[area];
+              const areaInfo = schedule.areasInfo ? schedule.areasInfo[area] : null;
+              const hasChief = areaInfo && (areaInfo.chiefName || areaInfo.deputyName);
+              const totalRows = tasksInArea.length + (hasChief ? 1 : 0);
+              
+              return (
+                <React.Fragment key={area}>
+                  {tasksInArea.map((task, index) => (
+                    <tr key={task.id}>
+                      {index === 0 && (
+                        <td 
+                          rowSpan={totalRows} 
+                          className="print-cell"
+                          style={{ 
+                            borderRight: '1px solid #e5e7eb', 
+                            borderBottom: '1px solid #e5e7eb',
+                            verticalAlign: 'top', 
+                            textAlign: 'center',
+                            backgroundColor: areaIndex % 2 === 0 ? '#e0f2fe' : '#fce7f3',
+                            padding: '1rem 0.5rem'
+                          }}
                         >
-                          <option value="" disabled>+ 新增</option>
-                          {unassignedStudents.map(s => (
-                            <option key={s.id} value={s.id}>{s.no}{s.name}</option>
+                          <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{area}</div>
+                          {areaInfo && areaInfo.chiefName && (
+                            <div className="no-print" style={{ fontSize: '0.85rem', color: 'var(--primary-color)', marginBottom: '0.2rem' }}>
+                              <span style={{ border: '1px solid currentColor', borderRadius: '4px', padding: '0 2px', marginRight: '4px' }}>股長</span>
+                              {areaInfo.chiefName}
+                            </div>
+                          )}
+                          {areaInfo && areaInfo.deputyName && (
+                            <div className="no-print" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                              <span style={{ border: '1px solid currentColor', borderRadius: '4px', padding: '0 2px', marginRight: '4px' }}>代理</span>
+                              {areaInfo.deputyName}
+                            </div>
+                          )}
+                        </td>
+                      )}
+                      <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb' }}>{task.name}</td>
+                      <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>{task.count}</td>
+                      <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb' }}>
+                        <div 
+                          style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', minHeight: '30px' }}
+                          onDragOver={onDragOver}
+                          onDrop={(e) => onDropToTask(e, task.id)}
+                        >
+                          {task.assignedStudents.map(s => (
+                            <div 
+                              key={s.id} 
+                              className="student-chip" 
+                              draggable
+                              onDragStart={(e) => onDragStart(e, s.id, task.id)}
+                              style={{ 
+                                display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f6', 
+                                padding: '0.2rem 0.5rem', borderRadius: '12px', fontSize: '0.9rem', 
+                                border: '1px solid #e5e7eb', cursor: 'grab'
+                              }}
+                            >
+                              <span>{s.no}{s.name}</span>
+                              <button 
+                                className="no-print"
+                                onClick={() => handleRemoveStudent(task.id, s.id)}
+                                style={{ 
+                                  background: 'transparent', border: 'none', color: '#ef4444', 
+                                  marginLeft: '0.3rem', cursor: 'pointer', fontWeight: 'bold', padding: '0 0.2rem'
+                                }}
+                                title="移除"
+                              >×</button>
+                            </div>
                           ))}
-                        </select>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            ))}
+                          <select 
+                            className="no-print form-control" 
+                            style={{ width: 'auto', padding: '0.1rem 0.5rem', fontSize: '0.85rem', borderRadius: '12px', borderColor: '#d1d5db' }}
+                            onChange={(e) => handleAddStudent(task.id, e)}
+                            value=""
+                          >
+                            <option value="" disabled>+ 新增</option>
+                            {unassignedStudents.map(s => (
+                              <option key={s.id} value={s.id}>{s.no}{s.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  
+                  {/* Chief Row added for UI and Print consistency with Excel */}
+                  {hasChief && (
+                    <tr className="print-cell">
+                      <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb' }}>
+                        {tasksInArea.length + 1} {area}股長_檢查
+                      </td>
+                      <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>1</td>
+                      <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          {areaInfo.chiefName && (
+                            <span className="student-chip" style={{ backgroundColor: '#fce7f3', padding: '0.2rem 0.5rem', borderRadius: '12px', fontSize: '0.9rem', border: '1px solid #fbcfe8', color: '#be185d' }}>
+                              股長：{areaInfo.chiefName}
+                            </span>
+                          )}
+                          {areaInfo.deputyName && (
+                            <span className="student-chip" style={{ backgroundColor: '#e0f2fe', padding: '0.2rem 0.5rem', borderRadius: '12px', fontSize: '0.9rem', border: '1px solid #bae6fd', color: '#0369a1' }}>
+                              代理股長：{areaInfo.deputyName}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>
       
-      <div style={{ marginTop: '2rem', fontSize: '0.9rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: 'var(--radius-sm)', whiteSpace: 'pre-wrap' }}>
+      <div className="no-print" style={{ marginTop: '2rem', fontSize: '0.9rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: 'var(--radius-sm)', whiteSpace: 'pre-wrap' }}>
         {settings.scheduleRules}
       </div>
       
       {settings.extraNotes && (
-        <div style={{ marginTop: '1rem', fontSize: '0.9rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: 'var(--radius-sm)', whiteSpace: 'pre-wrap', backgroundColor: '#f9fafb' }}>
+        <div className="print-extra-notes" style={{ marginTop: '1rem', fontSize: '0.9rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: 'var(--radius-sm)', whiteSpace: 'pre-wrap', backgroundColor: '#f9fafb' }}>
           <strong>備註：</strong><br />
           {settings.extraNotes}
         </div>

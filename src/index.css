@@ -184,14 +184,50 @@ h1, h2, h3, h4, h5, h6 {
   .no-print {
     display: none !important;
   }
+  .screen-only {
+    display: none !important;
+  }
+  .print-only {
+    display: table-header-group !important;
+  }
   .glass-card {
-    box-shadow: none;
-    border: 1px solid #ccc;
-    background: white;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
   .app-container {
     padding: 0;
     max-width: 100%;
+  }
+  .print-table {
+    border: 2px solid black !important;
+  }
+  .print-table th, .print-table td {
+    border: 1px solid black !important;
+    color: black !important;
+    padding: 4px 8px !important;
+    background-color: white !important;
+  }
+  .student-chip {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    display: inline !important;
+    color: black !important;
+  }
+  .student-chip::after {
+    content: " , ";
+  }
+  .student-chip:last-child::after {
+    content: "";
+  }
+  .print-extra-notes {
+    border: none !important;
+    padding: 0 !important;
+    margin-top: 1rem !important;
+    background: white !important;
   }
 }
 
