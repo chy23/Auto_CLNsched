@@ -19,6 +19,15 @@ function TaskManager({ tasks, setTasks, areas }) {
     setTasks(tasks.filter(t => t.id !== id));
   };
 
+  const handleUpdate = (id, field, value) => {
+    setTasks(tasks.map(t => {
+      if (t.id === id) {
+        return { ...t, [field]: value };
+      }
+      return t;
+    }));
+  };
+
   const loadDefaults = () => {
     const defaultTasks = [
       { id: 1, area: '教室掃區', name: '黑板整理', count: 1, genderReq: '無' },
@@ -102,9 +111,37 @@ function TaskManager({ tasks, setTasks, areas }) {
             {tasks.map(t => (
               <tr key={t.id}>
                 <td>{t.area}</td>
-                <td>{t.name}</td>
-                <td>{t.count}</td>
-                <td>{t.genderReq}</td>
+                <td>
+                  <input 
+                    className="form-control" 
+                    type="text" 
+                    value={t.name} 
+                    onChange={(e) => handleUpdate(t.id, 'name', e.target.value)} 
+                    style={{ padding: '0.2rem', width: '100%', minWidth: '150px' }}
+                  />
+                </td>
+                <td>
+                  <input 
+                    className="form-control" 
+                    type="number" 
+                    value={t.count} 
+                    min="1"
+                    onChange={(e) => handleUpdate(t.id, 'count', e.target.value)} 
+                    style={{ padding: '0.2rem', width: '60px' }}
+                  />
+                </td>
+                <td>
+                  <select 
+                    className="form-control" 
+                    value={t.genderReq} 
+                    onChange={(e) => handleUpdate(t.id, 'genderReq', e.target.value)} 
+                    style={{ padding: '0.2rem' }}
+                  >
+                    <option value="無">性別不限</option>
+                    <option value="限男生">限男生</option>
+                    <option value="限女生">限女生</option>
+                  </select>
+                </td>
                 <td>
                   <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem' }} onClick={() => handleRemove(t.id)}>刪</button>
                 </td>
