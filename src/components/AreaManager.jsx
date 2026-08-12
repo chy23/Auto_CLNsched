@@ -24,6 +24,13 @@ function AreaManager({ areas, setAreas, students }) {
     }));
   };
 
+  const assignedChiefsAndDeputies = areas.flatMap(a => [a.chief, a.deputy]).filter(Boolean).map(String);
+
+  const isStudentSelectable = (studentId, currentValue) => {
+    if (String(studentId) === String(currentValue)) return true;
+    return !assignedChiefsAndDeputies.includes(String(studentId));
+  };
+
   return (
     <div className="glass-card">
       <h2 style={{ color: 'var(--primary-color)' }}>🏷️ 掃區與股長管理</h2>
@@ -66,7 +73,7 @@ function AreaManager({ areas, setAreas, students }) {
                   >
                     <option value="">-- 無 --</option>
                     {students.map(s => (
-                      <option key={s.id} value={s.id}>{s.no} {s.name}</option>
+                      isStudentSelectable(s.id, area.chief) && <option key={s.id} value={s.id}>{s.no} {s.name}</option>
                     ))}
                   </select>
                 </td>
@@ -79,7 +86,7 @@ function AreaManager({ areas, setAreas, students }) {
                   >
                     <option value="">-- 無 --</option>
                     {students.map(s => (
-                      <option key={s.id} value={s.id}>{s.no} {s.name}</option>
+                      isStudentSelectable(s.id, area.deputy) && <option key={s.id} value={s.id}>{s.no} {s.name}</option>
                     ))}
                   </select>
                 </td>
