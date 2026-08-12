@@ -84,20 +84,48 @@ function App() {
     const taskState = sortedTasks.map(t => ({ ...t, assignedStudents: [], remaining: parseInt(t.count, 10) }));
 
     // 2. Assign Deputies first
-    for (const task of taskState) {
-      const areaDeputies = deputies.filter(d => d.areaName === task.area);
-      for (const dep of areaDeputies) {
-        if (task.remaining > 0) {
-          const depStudentIndex = availableStudents.findIndex(s => String(s.id) === String(dep.studentId));
-          if (depStudentIndex !== -1) {
-            const depStudent = availableStudents[depStudentIndex];
-            if ((task.genderReq === '限男生' && depStudent.gender !== '男') || 
-                (task.genderReq === '限女生' && depStudent.gender !== '女')) {
-              // skip
-            } else {
-              task.assignedStudents.push(depStudent);
-              availableStudents.splice(depStudentIndex, 1);
-              task.remaining--;
+    for (const dep of deputies) {
+      const depStudentIndex = availableStudents.findIndex(s => String(s.id) === String(dep.studentId));
+      if (depStudentIndex !== -1) {
+        const depStudent = availableStudents[depStudentIndex];
+        let assigned = false;
+        
+        // 代理衛生股長(教室掃區)指定工作
+        if (dep.areaName.includes('教室')) {
+          const preferredTasks = [
+            '老師座位整理(每週1、4、5拖地)',
+            '共用書櫃＋門把+布告欄 “整理” 及\'擦拭\''
+          ];
+          for (const pTaskName of preferredTasks) {
+            const task = taskState.find(t => t.area === dep.areaName && t.name === pTaskName && t.remaining > 0);
+            if (task) {
+              if ((task.genderReq === '限男生' && depStudent.gender !== '男') || 
+                  (task.genderReq === '限女生' && depStudent.gender !== '女')) {
+                // skip due to gender mismatch
+              } else {
+                task.assignedStudents.push(depStudent);
+                availableStudents.splice(depStudentIndex, 1);
+                task.remaining--;
+                assigned = true;
+                break;
+              }
+            }
+          }
+        }
+        
+        // Fallback for other areas or if preferred tasks are unavailable
+        if (!assigned) {
+          for (const task of taskState) {
+            if (task.area === dep.areaName && task.remaining > 0) {
+              if ((task.genderReq === '限男生' && depStudent.gender !== '男') || 
+                  (task.genderReq === '限女生' && depStudent.gender !== '女')) {
+                // skip
+              } else {
+                task.assignedStudents.push(depStudent);
+                availableStudents.splice(depStudentIndex, 1);
+                task.remaining--;
+                break;
+              }
             }
           }
         }
