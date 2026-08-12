@@ -11,7 +11,7 @@ function ChecklistView({ schedule, settings }) {
   }
 
   // Create columns for dates (empty columns for the checklist)
-  const columns = Array.from({ length: 10 }, (_, i) => i + 1);
+  const columns = Array.from({ length: 25 }, (_, i) => i + 1);
 
   // Group by area
   const groupedTasks = schedule.assignments.reduce((acc, task) => {
