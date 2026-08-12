@@ -111,7 +111,15 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
     const merges = [];
     
     // Row 0: Title
-    data.push(['麗園國小掃地工作表']);
+    const titleParts = [];
+    if (settings.year) titleParts.push(`${settings.year}學年度`);
+    if (settings.semester) titleParts.push(settings.semester);
+    if (settings.school) titleParts.push(settings.school);
+    if (settings.className) titleParts.push(settings.className);
+    titleParts.push('掃地工作表');
+    const fullTitle = titleParts.join(' ');
+
+    data.push([fullTitle]);
     merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } });
     
     // Row 1: Rules
@@ -257,7 +265,7 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
       )}
 
       <div className="print-header" style={{ display: 'none', textAlign: 'center', marginBottom: '1rem' }}>
-        <h2>掃地工作表</h2>
+        <h2>{[settings.year ? `${settings.year}學年度` : '', settings.semester, settings.school, settings.className, '掃地工作表'].filter(Boolean).join(' ')}</h2>
       </div>
 
       <div className="table-container" style={{ boxShadow: 'none', border: '1px solid #e5e7eb' }}>

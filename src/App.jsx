@@ -36,7 +36,11 @@ function App() {
     return saved ? JSON.parse(saved) : {
       scheduleRules: "時段一：早上打掃時段\n（外掃：請於7:50離開掃區回班級。）\n未完成打掃請在大下課補完成\n時段二：掃地時間\n週一二四五 14:50~15:10 周三 10:10~10:30\n（請詳細完成掃地工作，並於掃地時間結束前3分鐘返回班級）",
       checklistRules: "*✔️完成打掃\n*○打掃時間嬉鬧玩耍\n*❌未打掃\n*△打掃不確實",
-      extraNotes: ""
+      extraNotes: "",
+      school: "麗園國小",
+      year: "112",
+      semester: "上學期",
+      className: "六年一班"
     };
   });
 

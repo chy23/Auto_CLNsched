@@ -33,7 +33,15 @@ function ChecklistView({ schedule, settings }) {
       if (areaInfo && areaInfo.deputyName) chiefStr += `【代理股長：${areaInfo.deputyName}】`;
       
       // Row 0: Title
-      data.push([`麗園國小掃地工作檢核表 - ${area}    ${chiefStr}`]);
+      const titleParts = [];
+      if (settings.year) titleParts.push(`${settings.year}學年度`);
+      if (settings.semester) titleParts.push(settings.semester);
+      if (settings.school) titleParts.push(settings.school);
+      if (settings.className) titleParts.push(settings.className);
+      titleParts.push(`掃地工作檢核表 - ${area}    ${chiefStr}`);
+      const fullTitle = titleParts.join(' ');
+
+      data.push([fullTitle]);
       merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: columns.length + 1 } });
       
       // Row 1: 打掃範圍 & Rules
@@ -149,7 +157,7 @@ function ChecklistView({ schedule, settings }) {
       {Object.keys(groupedTasks).map(area => (
         <div key={area} style={{ pageBreakInside: 'avoid', marginBottom: '3rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0 }}>掃地工作檢核表 - {area}</h3>
+            <h3 style={{ margin: 0 }}>{[settings.year ? `${settings.year}學年度` : '', settings.semester, settings.school, settings.className, `掃地工作檢核表 - ${area}`].filter(Boolean).join(' ')}</h3>
           </div>
           
           <div style={{ marginBottom: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>
