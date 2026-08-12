@@ -31,6 +31,11 @@ function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [history, setHistory] = useState(() => {
+    const saved = localStorage.getItem('history');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('settings');
     return saved ? JSON.parse(saved) : {
@@ -67,7 +72,30 @@ function App() {
     localStorage.setItem('schedule', JSON.stringify(schedule));
   }, [schedule]);
 
+  useEffect(() => {
+    localStorage.setItem('history', JSON.stringify(history));
+  }, [history]);
+
   const generateSchedule = () => {
+    if (schedule) {
+      const confirmRegenerate = window.confirm("您確定要重新產生排班表嗎？\n這將會覆蓋您目前的微調結果。\n（系統會自動將目前的排班表記憶為歷史紀錄，並盡量安排輪替不同的工作）");
+      if (!confirmRegenerate) return;
+      
+      // Save current schedule to history
+      setHistory(schedule);
+    }
+    
+    // Build a map of what task each student did in the previous schedule (or history)
+    const prevAssignments = new Map();
+    const referenceSchedule = schedule || history;
+    if (referenceSchedule && referenceSchedule.assignments) {
+      referenceSchedule.assignments.forEach(task => {
+        task.assignedStudents.forEach(student => {
+          prevAssignments.set(String(student.id), task.name);
+        });
+      });
+    }
+
     // 1. Identify all chiefs and deputies
     const chiefs = areas.map(a => a.chief).filter(id => id);
     const deputies = areas.map(a => ({ areaName: a.name, studentId: a.deputy })).filter(d => d.studentId);
@@ -163,11 +191,16 @@ function App() {
       while (madeAssignment && pool.length > 0) {
         madeAssignment = false;
         
-        // Loop over tasks by area alternating to ensure even distribution across areas?
-        // Since taskState is likely grouped by area implicitly, looping it distributes 1 per task. 
-        // This distributes them evenly across all tasks!
+        // Loop over tasks by area alternating to ensure even distribution across areas
         for (const task of taskState) {
           if (task.remaining > 0 && pool.length > 0) {
+            // Sort pool so that students who did THIS task last time are at the end
+            pool.sort((a, b) => {
+              const aDidThisTask = prevAssignments.get(String(a.id)) === task.name ? 1 : 0;
+              const bDidThisTask = prevAssignments.get(String(b.id)) === task.name ? 1 : 0;
+              return aDidThisTask - bDidThisTask;
+            });
+            
             const candidateIndex = pool.findIndex(s => {
               if (task.genderReq === '限男生' && s.gender !== '男') return false;
               if (task.genderReq === '限女生' && s.gender !== '女') return false;
@@ -238,7 +271,12 @@ function App() {
               <StudentManager students={students} setStudents={setStudents} />
               <TaskManager tasks={tasks} setTasks={setTasks} areas={areas} />
             </div>
-            <SettingsManager settings={settings} setSettings={setSettings} />
+            <SettingsManager 
+              settings={settings} setSettings={setSettings} 
+              students={students} setStudents={setStudents}
+              tasks={tasks} setTasks={setTasks}
+              areas={areas} setAreas={setAreas}
+            />
             
             <div style={{ textAlign: 'center', marginTop: '2rem' }} className="no-print">
               <button 

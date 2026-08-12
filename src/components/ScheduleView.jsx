@@ -112,8 +112,9 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
     
     // Row 0: Title
     const titleParts = [];
+    const semesterStr = settings.semester || '上學期';
     if (settings.year) titleParts.push(`${settings.year}學年度`);
-    if (settings.semester) titleParts.push(settings.semester);
+    if (semesterStr) titleParts.push(semesterStr);
     if (settings.school) titleParts.push(settings.school);
     if (settings.grade && settings.classNo) {
       titleParts.push(`${settings.grade}年${settings.classNo}班`);
@@ -192,11 +193,11 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
     const rulesLines = (settings.scheduleRules || '').split('\n').length;
     ws['!rows'] = [];
     ws['!rows'][0] = { hpt: 30 };
-    ws['!rows'][1] = { hpt: Math.max(30, rulesLines * 16 + 10) };
+    ws['!rows'][1] = { hpt: Math.max(50, rulesLines * 25 + 20) };
     
     if (settings.extraNotes) {
       const extraNotesLines = settings.extraNotes.split('\n').length;
-      ws['!rows'][data.length - 1] = { hpt: Math.max(30, extraNotesLines * 16 + 10) };
+      ws['!rows'][data.length - 1] = { hpt: Math.max(40, extraNotesLines * 20 + 20) };
     }
 
     const borderAll = {
@@ -253,19 +254,26 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
           <h4 style={{ color: '#92400e', marginBottom: '0.5rem', marginTop: 0 }}>⚠️ 尚未分配工作的學生（備用名單）：</h4>
           <p style={{ fontSize: '0.8rem', color: '#b45309', margin: '0 0 0.5rem 0' }}>💡 您可以將這裡的學生拖曳到下方的打掃範圍，或將下方的學生拖曳回這裡。</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {unassignedStudents.map(s => (
-              <span 
-                key={s.id} 
-                draggable
-                onDragStart={(e) => onDragStart(e, s.id, 'unassigned')}
-                style={{ 
-                  backgroundColor: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', 
-                  border: '1px solid #fcd34d', fontSize: '0.9rem', cursor: 'grab' 
-                }}
-              >
-                {s.no}{s.name} ({s.gender})
-              </span>
-            ))}
+            {unassignedStudents.map(s => {
+              const isLate = s.arrival === '晚到';
+              const bgColor = isLate ? '#ffedd5' : '#dcfce7'; // orange-100 or green-100
+              const borderColor = isLate ? '#fdba74' : '#86efac'; // orange-300 or green-300
+              const textColor = isLate ? '#c2410c' : '#166534'; // orange-700 or green-800
+              
+              return (
+                <span 
+                  key={s.id} 
+                  draggable
+                  onDragStart={(e) => onDragStart(e, s.id, 'unassigned')}
+                  style={{ 
+                    backgroundColor: bgColor, padding: '0.2rem 0.5rem', borderRadius: '4px', 
+                    border: `1px solid ${borderColor}`, color: textColor, fontSize: '0.9rem', cursor: 'grab' 
+                  }}
+                >
+                  {s.no}{s.name} ({s.gender}) - {s.arrival || '早到'}
+                </span>
+              );
+            })}
           </div>
         </div>
       )}
@@ -274,7 +282,7 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
         <h2>
           {[
             settings.year ? `${settings.year}學年度` : '', 
-            settings.semester, 
+            settings.semester || '上學期', 
             settings.school, 
             (settings.grade && settings.classNo) ? `${settings.grade}年${settings.classNo}班` : 
               (settings.grade ? `${settings.grade}年級` : (settings.classNo ? `${settings.classNo}班` : '')),

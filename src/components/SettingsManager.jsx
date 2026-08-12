@@ -1,14 +1,59 @@
 import React from 'react';
 
-function SettingsManager({ settings, setSettings }) {
+function SettingsManager({ settings, setSettings, students, setStudents, tasks, setTasks, areas, setAreas }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSettings(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleExport = () => {
+    const data = { students, tasks, areas, settings };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `掃地排班系統備份_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.students) setStudents(data.students);
+        if (data.tasks) setTasks(data.tasks);
+        if (data.areas) setAreas(data.areas);
+        if (data.settings) setSettings(data.settings);
+        alert('✅ 設定檔匯入成功！');
+      } catch (err) {
+        alert('❌ 檔案格式錯誤，匯入失敗。');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null; // reset
+  };
+
   return (
     <div className="glass-card" style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
-      <h2 style={{ color: 'var(--primary-color)' }}>⚙️ 報表文字與備註設定</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ color: 'var(--primary-color)', margin: 0 }}>⚙️ 報表文字與備註設定</h2>
+        
+        {/* Export / Import Buttons */}
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn btn-secondary" onClick={handleExport} style={{ fontSize: '0.9rem' }}>
+            💾 備份系統資料
+          </button>
+          <label className="btn btn-secondary" style={{ cursor: 'pointer', fontSize: '0.9rem', margin: 0 }}>
+            📂 還原系統資料
+            <input type="file" accept=".json" style={{ display: 'none' }} onChange={handleImport} />
+          </label>
+        </div>
+      </div>
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>
         <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>

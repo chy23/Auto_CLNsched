@@ -34,8 +34,9 @@ function ChecklistView({ schedule, settings }) {
       
       // Row 0: Title
       const titleParts = [];
+      const semesterStr = settings.semester || '上學期';
       if (settings.year) titleParts.push(`${settings.year}學年度`);
-      if (settings.semester) titleParts.push(settings.semester);
+      if (semesterStr) titleParts.push(semesterStr);
       if (settings.school) titleParts.push(settings.school);
       if (settings.grade && settings.classNo) {
         titleParts.push(`${settings.grade}年${settings.classNo}班`);
@@ -108,11 +109,11 @@ function ChecklistView({ schedule, settings }) {
       const rulesLines = (settings.checklistRules || '').split('\n').length;
       ws['!rows'] = [];
       ws['!rows'][0] = { hpt: 30 };
-      ws['!rows'][1] = { hpt: Math.max(30, rulesLines * 16 + 10) };
+      ws['!rows'][1] = { hpt: Math.max(50, rulesLines * 25 + 20) };
       
       if (settings.extraNotes) {
         const extraNotesLines = settings.extraNotes.split('\n').length;
-        ws['!rows'][data.length - 1] = { hpt: Math.max(30, extraNotesLines * 16 + 10) };
+        ws['!rows'][data.length - 1] = { hpt: Math.max(40, extraNotesLines * 20 + 20) };
       }
 
       const borderAll = {
@@ -166,7 +167,7 @@ function ChecklistView({ schedule, settings }) {
             <h3 style={{ margin: 0 }}>
               {[
                 settings.year ? `${settings.year}學年度` : '', 
-                settings.semester, 
+                settings.semester || '上學期', 
                 settings.school, 
                 (settings.grade && settings.classNo) ? `${settings.grade}年${settings.classNo}班` : 
                   (settings.grade ? `${settings.grade}年級` : (settings.classNo ? `${settings.classNo}班` : '')),
