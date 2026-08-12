@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 
 function ScheduleView({ schedule, setSchedule, students }) {
   if (!schedule) {
@@ -25,6 +25,57 @@ function ScheduleView({ schedule, setSchedule, students }) {
       }
       return task;
     });
+    setSchedule({ ...schedule, assignments: newAssignments });
+  };
+
+  const onDragStart = (e, studentId, sourceTaskId) => {
+    e.dataTransfer.setData("studentId", studentId);
+    e.dataTransfer.setData("sourceTaskId", sourceTaskId || 'unassigned');
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const onDropToUnassigned = (e) => {
+    e.preventDefault();
+    const studentId = e.dataTransfer.getData("studentId");
+    const sourceTaskId = e.dataTransfer.getData("sourceTaskId");
+    if (sourceTaskId !== 'unassigned') {
+      handleRemoveStudent(parseInt(sourceTaskId, 10), studentId);
+    }
+  };
+
+  const onDropToTask = (e, targetTaskId) => {
+    e.preventDefault();
+    const studentId = e.dataTransfer.getData("studentId");
+    const sourceTaskId = e.dataTransfer.getData("sourceTaskId");
+    
+    if (sourceTaskId === String(targetTaskId)) return;
+
+    const studentToAdd = students.find(s => String(s.id) === String(studentId));
+    if (!studentToAdd) return;
+
+    let newAssignments = schedule.assignments;
+    if (sourceTaskId !== 'unassigned') {
+      newAssignments = newAssignments.map(task => {
+        if (task.id === parseInt(sourceTaskId, 10)) {
+          return { ...task, assignedStudents: task.assignedStudents.filter(s => String(s.id) !== String(studentId)) };
+        }
+        return task;
+      });
+    }
+
+    newAssignments = newAssignments.map(task => {
+      if (task.id === targetTaskId) {
+        // Prevent duplicates
+        if (!task.assignedStudents.find(s => String(s.id) === String(studentId))) {
+          return { ...task, assignedStudents: [...task.assignedStudents, studentToAdd] };
+        }
+      }
+      return task;
+    });
+    
     setSchedule({ ...schedule, assignments: newAssignments });
   };
 
@@ -118,6 +169,36 @@ function ScheduleView({ schedule, setSchedule, students }) {
       { wch: 5 }, // count
       { wch: 40 } // students
     ];
+    ws['!rows'] = [{ hpt: 30 }, { hpt: 100 }];
+
+    const borderAll = {
+      top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" }
+    };
+    
+    const maxRow = data.length;
+    for (let R = 0; R < maxRow; ++R) {
+      for (let C = 0; C < 4; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({r: R, c: C});
+        if (!ws[cellAddress]) ws[cellAddress] = { t: 's', v: '' };
+        
+        let cellStyle = {
+          font: { name: "微軟正黑體", sz: 12 },
+          alignment: { vertical: "center", horizontal: "center", wrapText: true },
+          border: borderAll
+        };
+        
+        if (R === 0) {
+          cellStyle.font = { name: "微軟正黑體", sz: 16, bold: true };
+        } else if (R === 1 && C === 3) {
+          cellStyle.alignment = { vertical: "center", horizontal: "left", wrapText: true };
+          cellStyle.font = { name: "微軟正黑體", sz: 10 };
+        } else if (R >= 2 && C === 1) {
+          cellStyle.alignment = { vertical: "center", horizontal: "left", wrapText: true };
+        }
+        
+        ws[cellAddress].s = cellStyle;
+      }
+    }
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "總排班表");
@@ -135,11 +216,25 @@ function ScheduleView({ schedule, setSchedule, students }) {
       </div>
 
       {unassignedStudents.length > 0 && (
-        <div className="no-print" style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#fef3c7', borderRadius: '8px', border: '1px solid #fde68a' }}>
+        <div 
+          className="no-print" 
+          style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#fef3c7', borderRadius: '8px', border: '1px dashed #f59e0b', minHeight: '80px' }}
+          onDragOver={onDragOver}
+          onDrop={onDropToUnassigned}
+        >
           <h4 style={{ color: '#92400e', marginBottom: '0.5rem', marginTop: 0 }}>⚠️ 尚未分配工作的學生（備用名單）：</h4>
+          <p style={{ fontSize: '0.8rem', color: '#b45309', margin: '0 0 0.5rem 0' }}>💡 您可以將這裡的學生拖曳到下方的打掃範圍，或將下方的學生拖曳回這裡。</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             {unassignedStudents.map(s => (
-              <span key={s.id} style={{ backgroundColor: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid #fcd34d', fontSize: '0.9rem' }}>
+              <span 
+                key={s.id} 
+                draggable
+                onDragStart={(e) => onDragStart(e, s.id, 'unassigned')}
+                style={{ 
+                  backgroundColor: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', 
+                  border: '1px solid #fcd34d', fontSize: '0.9rem', cursor: 'grab' 
+                }}
+              >
                 {s.no}{s.name} ({s.gender})
               </span>
             ))}
@@ -197,12 +292,23 @@ function ScheduleView({ schedule, setSchedule, students }) {
                     <td style={{ borderBottom: '1px solid #e5e7eb' }}>{task.name}</td>
                     <td style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>{task.count}</td>
                     <td style={{ borderBottom: '1px solid #e5e7eb' }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+                      <div 
+                        style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', minHeight: '30px' }}
+                        onDragOver={onDragOver}
+                        onDrop={(e) => onDropToTask(e, task.id)}
+                      >
                         {task.assignedStudents.map(s => (
-                          <div key={s.id} className="student-chip" style={{ 
-                            display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f6', 
-                            padding: '0.2rem 0.5rem', borderRadius: '12px', fontSize: '0.9rem', border: '1px solid #e5e7eb'
-                          }}>
+                          <div 
+                            key={s.id} 
+                            className="student-chip" 
+                            draggable
+                            onDragStart={(e) => onDragStart(e, s.id, task.id)}
+                            style={{ 
+                              display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f6', 
+                              padding: '0.2rem 0.5rem', borderRadius: '12px', fontSize: '0.9rem', 
+                              border: '1px solid #e5e7eb', cursor: 'grab'
+                            }}
+                          >
                             <span>{s.no}{s.name}</span>
                             <button 
                               className="no-print"

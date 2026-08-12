@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 
 function ChecklistView({ schedule }) {
   if (!schedule) {
@@ -85,6 +85,34 @@ function ChecklistView({ schedule }) {
         { wch: 15 }, // student name
         ...columns.map(() => ({ wch: 5 })) // checkboxes
       ];
+
+      const borderAll = {
+        top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" }
+      };
+      
+      for (let R = 0; R < currentRow; ++R) {
+        for (let C = 0; C < columns.length + 3; ++C) {
+          const cellAddress = XLSX.utils.encode_cell({r: R, c: C});
+          if (!ws[cellAddress]) ws[cellAddress] = { t: 's', v: '' };
+          
+          let cellStyle = {
+            font: { name: "微軟正黑體", sz: 12 },
+            alignment: { vertical: "center", horizontal: "center", wrapText: true },
+            border: borderAll
+          };
+          
+          if (R === 0) {
+            cellStyle.font = { name: "微軟正黑體", sz: 16, bold: true };
+          } else if (R === 1 && C >= 2) {
+            cellStyle.alignment = { vertical: "center", horizontal: "left", wrapText: true };
+            cellStyle.font = { name: "微軟正黑體", sz: 10 };
+          } else if (R >= 3 && C === 1) {
+            cellStyle.alignment = { vertical: "center", horizontal: "left", wrapText: true };
+          }
+          
+          ws[cellAddress].s = cellStyle;
+        }
+      }
 
       const sheetName = area.substring(0, 31);
       XLSX.utils.book_append_sheet(wb, ws, sheetName);

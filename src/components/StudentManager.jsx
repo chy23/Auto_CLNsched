@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 
 function StudentManager({ students, setStudents }) {
   const [inputData, setInputData] = useState('');
