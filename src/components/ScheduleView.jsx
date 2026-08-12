@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx-js-style';
 
-function ScheduleView({ schedule, setSchedule, students }) {
+function ScheduleView({ schedule, setSchedule, students, settings }) {
   if (!schedule) {
     return (
       <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -115,8 +115,7 @@ function ScheduleView({ schedule, setSchedule, students }) {
     merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } });
     
     // Row 1: Rules
-    const rules = "時段一：早上打掃時段\n（外掃：請於7:50離開掃區回班級。）\n未完成打掃請在大下課補完成\n時段二：掃地時間\n週一二四五14:50~15:10 周三10:10~10:30\n（請詳細完成掃地工作，並於掃地時間結束前3分鐘返回班級）";
-    data.push(['', '', '人數', rules]);
+    data.push(['', '', '人數', settings.scheduleRules]);
     
     // Data rows
     let currentRow = 2;
@@ -159,6 +158,12 @@ function ScheduleView({ schedule, setSchedule, students }) {
       data.push([]);
       data.push(['未分配工作名單']);
       data.push([unassignedStudents.map(s => `${s.no}${s.name}`).join(' , ')]);
+    }
+    
+    if (settings.extraNotes) {
+      data.push([]);
+      data.push(['備註：']);
+      data.push([settings.extraNotes]);
     }
 
     const ws = XLSX.utils.aoa_to_sheet(data);
@@ -342,18 +347,16 @@ function ScheduleView({ schedule, setSchedule, students }) {
         </table>
       </div>
       
-      <div style={{ marginTop: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', fontSize: '0.9rem' }}>
-        <div style={{ border: '1px solid #e5e7eb', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
-          <h4 style={{ marginBottom: '0.5rem' }}>時段一：早上打掃時段</h4>
-          <p>（外掃：請於7:50離開掃區回班級。）</p>
-          <p style={{ fontWeight: 'bold', textDecoration: 'underline' }}>未完成打掃請在大下課補完成</p>
-        </div>
-        <div style={{ border: '1px solid #e5e7eb', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
-          <h4 style={{ marginBottom: '0.5rem' }}>時段二：掃地時間</h4>
-          <p>週一二四五 14:50~15:10，週三 10:10~10:30</p>
-          <p>（請詳細完成掃地工作，並於結束前3分鐘返回班級）</p>
-        </div>
+      <div style={{ marginTop: '2rem', fontSize: '0.9rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: 'var(--radius-sm)', whiteSpace: 'pre-wrap' }}>
+        {settings.scheduleRules}
       </div>
+      
+      {settings.extraNotes && (
+        <div style={{ marginTop: '1rem', fontSize: '0.9rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: 'var(--radius-sm)', whiteSpace: 'pre-wrap', backgroundColor: '#f9fafb' }}>
+          <strong>備註：</strong><br />
+          {settings.extraNotes}
+        </div>
+      )}
     </div>
   );
 }

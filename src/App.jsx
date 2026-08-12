@@ -4,6 +4,7 @@ import TaskManager from './components/TaskManager';
 import AreaManager from './components/AreaManager';
 import ScheduleView from './components/ScheduleView';
 import ChecklistView from './components/ChecklistView';
+import SettingsManager from './components/SettingsManager';
 import './App.css';
 
 function App() {
@@ -30,6 +31,15 @@ function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [settings, setSettings] = useState(() => {
+    const saved = localStorage.getItem('settings');
+    return saved ? JSON.parse(saved) : {
+      scheduleRules: "時段一：早上打掃時段\n（外掃：請於7:50離開掃區回班級。）\n未完成打掃請在大下課補完成\n時段二：掃地時間\n週一二四五 14:50~15:10 周三 10:10~10:30\n（請詳細完成掃地工作，並於掃地時間結束前3分鐘返回班級）",
+      checklistRules: "*✔️完成打掃\n*○打掃時間嬉鬧玩耍\n*❌未打掃\n*△打掃不確實",
+      extraNotes: ""
+    };
+  });
+
   const [currentTab, setCurrentTab] = useState('setup');
 
   useEffect(() => {
@@ -43,6 +53,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem('areas', JSON.stringify(areas));
   }, [areas]);
+
+  useEffect(() => {
+    localStorage.setItem('settings', JSON.stringify(settings));
+  }, [settings]);
 
   useEffect(() => {
     localStorage.setItem('schedule', JSON.stringify(schedule));
@@ -219,6 +233,7 @@ function App() {
               <StudentManager students={students} setStudents={setStudents} />
               <TaskManager tasks={tasks} setTasks={setTasks} areas={areas} />
             </div>
+            <SettingsManager settings={settings} setSettings={setSettings} />
             
             <div style={{ textAlign: 'center', marginTop: '2rem' }} className="no-print">
               <button 
@@ -233,11 +248,11 @@ function App() {
         )}
 
         {currentTab === 'schedule' && (
-          <ScheduleView schedule={schedule} setSchedule={setSchedule} students={students} />
+          <ScheduleView schedule={schedule} setSchedule={setSchedule} students={students} settings={settings} />
         )}
 
         {currentTab === 'checklist' && (
-          <ChecklistView schedule={schedule} />
+          <ChecklistView schedule={schedule} settings={settings} />
         )}
       </main>
     </div>

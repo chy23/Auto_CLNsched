@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx-js-style';
 
-function ChecklistView({ schedule }) {
+function ChecklistView({ schedule, settings }) {
   if (!schedule) {
     return (
       <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -37,8 +37,7 @@ function ChecklistView({ schedule }) {
       merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: columns.length + 1 } });
       
       // Row 1: 打掃範圍 & Rules
-      const rules = "*✔️完成打掃\n*○打掃時間嬉鬧玩耍\n*❌未打掃\n*△打掃不確實";
-      data.push(['打掃範圍', '', rules]);
+      data.push(['打掃範圍', '', settings.checklistRules]);
       merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: 1 } }); // 打掃範圍 spans 2 cols
       merges.push({ s: { r: 1, c: 2 }, e: { r: 1, c: columns.length + 1 } }); // rules spans remaining cols
       
@@ -76,6 +75,12 @@ function ChecklistView({ schedule }) {
         
         currentRow += studentsCount;
       });
+      
+      if (settings.extraNotes) {
+        data.push([]);
+        data.push(['備註：', settings.extraNotes]);
+        merges.push({ s: { r: currentRow + 1, c: 1 }, e: { r: currentRow + 1, c: columns.length + 1 } });
+      }
       
       const ws = XLSX.utils.aoa_to_sheet(data);
       ws['!merges'] = merges;
@@ -137,11 +142,8 @@ function ChecklistView({ schedule }) {
             <h3 style={{ margin: 0 }}>掃地工作檢核表 - {area}</h3>
           </div>
           
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            <span>* ✔️ 完成打掃</span>
-            <span>* ○ 打掃時間嬉鬧</span>
-            <span>* ❌ 未完成打掃</span>
-            <span>* △ 打掃不確實</span>
+          <div style={{ marginBottom: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>
+            {settings.checklistRules}
           </div>
 
           <div className="table-container" style={{ boxShadow: 'none', border: '1px solid #e5e7eb' }}>
@@ -170,6 +172,12 @@ function ChecklistView({ schedule }) {
               </tbody>
             </table>
           </div>
+          
+          {settings.extraNotes && (
+            <div style={{ marginTop: '1rem', fontSize: '0.8rem', padding: '1rem', border: '1px solid #e5e7eb', borderRadius: 'var(--radius-sm)', whiteSpace: 'pre-wrap', backgroundColor: '#f9fafb' }}>
+              <strong>備註：</strong> {settings.extraNotes}
+            </div>
+          )}
         </div>
       ))}
       
