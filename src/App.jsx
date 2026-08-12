@@ -40,7 +40,8 @@ function App() {
       school: "國小",
       year: "",
       semester: "上學期",
-      className: ""
+      grade: "",
+      classNo: ""
     };
   });
 

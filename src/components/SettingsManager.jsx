@@ -12,21 +12,34 @@ function SettingsManager({ settings, setSettings }) {
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>
         <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '120px' }}>
+          <div style={{ flex: 1, minWidth: '100px' }}>
             <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>學年</h4>
             <input type="text" name="year" className="form-control" value={settings.year || ''} onChange={handleChange} placeholder="e.g. 112" />
           </div>
-          <div style={{ flex: 1, minWidth: '120px' }}>
+          <div style={{ flex: 1, minWidth: '100px' }}>
             <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>學期</h4>
-            <input type="text" name="semester" className="form-control" value={settings.semester || ''} onChange={handleChange} placeholder="e.g. 上學期" />
+            <select name="semester" className="form-control" value={settings.semester || '上學期'} onChange={handleChange}>
+              <option value="上學期">上</option>
+              <option value="下學期">下</option>
+            </select>
           </div>
-          <div style={{ flex: 1, minWidth: '150px' }}>
+          <div style={{ flex: 1, minWidth: '120px' }}>
             <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>學校名稱</h4>
             <input type="text" name="school" className="form-control" value={settings.school || ''} onChange={handleChange} placeholder="e.g. 國小" />
           </div>
-          <div style={{ flex: 1, minWidth: '120px' }}>
+          <div style={{ flex: 1, minWidth: '100px' }}>
+            <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>年級</h4>
+            <select name="grade" className="form-control" value={settings.grade || ''} onChange={handleChange}>
+              <option value="">(無)</option>
+              {['一', '二', '三', '四', '五', '六'].map(g => <option key={g} value={g}>{g}年級</option>)}
+            </select>
+          </div>
+          <div style={{ flex: 1, minWidth: '100px' }}>
             <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>班級</h4>
-            <input type="text" name="className" className="form-control" value={settings.className || ''} onChange={handleChange} placeholder="e.g. 一年一班" />
+            <select name="classNo" className="form-control" value={settings.classNo || ''} onChange={handleChange}>
+              <option value="">(無)</option>
+              {Array.from({length: 12}, (_, i) => i + 1).map(c => <option key={c} value={c}>{c}班</option>)}
+            </select>
           </div>
         </div>
 

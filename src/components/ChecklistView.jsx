@@ -37,7 +37,13 @@ function ChecklistView({ schedule, settings }) {
       if (settings.year) titleParts.push(`${settings.year}學年度`);
       if (settings.semester) titleParts.push(settings.semester);
       if (settings.school) titleParts.push(settings.school);
-      if (settings.className) titleParts.push(settings.className);
+      if (settings.grade && settings.classNo) {
+        titleParts.push(`${settings.grade}年${settings.classNo}班`);
+      } else if (settings.grade) {
+        titleParts.push(`${settings.grade}年級`);
+      } else if (settings.classNo) {
+        titleParts.push(`${settings.classNo}班`);
+      }
       titleParts.push(`掃地工作檢核表 - ${area}    ${chiefStr}`);
       const fullTitle = titleParts.join(' ');
 
@@ -157,7 +163,16 @@ function ChecklistView({ schedule, settings }) {
       {Object.keys(groupedTasks).map(area => (
         <div key={area} style={{ pageBreakInside: 'avoid', marginBottom: '3rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0 }}>{[settings.year ? `${settings.year}學年度` : '', settings.semester, settings.school, settings.className, `掃地工作檢核表 - ${area}`].filter(Boolean).join(' ')}</h3>
+            <h3 style={{ margin: 0 }}>
+              {[
+                settings.year ? `${settings.year}學年度` : '', 
+                settings.semester, 
+                settings.school, 
+                (settings.grade && settings.classNo) ? `${settings.grade}年${settings.classNo}班` : 
+                  (settings.grade ? `${settings.grade}年級` : (settings.classNo ? `${settings.classNo}班` : '')),
+                `掃地工作檢核表 - ${area}`
+              ].filter(Boolean).join(' ')}
+            </h3>
           </div>
           
           <div style={{ marginBottom: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'pre-wrap' }}>

@@ -115,7 +115,13 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
     if (settings.year) titleParts.push(`${settings.year}學年度`);
     if (settings.semester) titleParts.push(settings.semester);
     if (settings.school) titleParts.push(settings.school);
-    if (settings.className) titleParts.push(settings.className);
+    if (settings.grade && settings.classNo) {
+      titleParts.push(`${settings.grade}年${settings.classNo}班`);
+    } else if (settings.grade) {
+      titleParts.push(`${settings.grade}年級`);
+    } else if (settings.classNo) {
+      titleParts.push(`${settings.classNo}班`);
+    }
     titleParts.push('掃地工作表');
     const fullTitle = titleParts.join(' ');
 
@@ -265,7 +271,16 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
       )}
 
       <div className="print-header" style={{ display: 'none', textAlign: 'center', marginBottom: '1rem' }}>
-        <h2>{[settings.year ? `${settings.year}學年度` : '', settings.semester, settings.school, settings.className, '掃地工作表'].filter(Boolean).join(' ')}</h2>
+        <h2>
+          {[
+            settings.year ? `${settings.year}學年度` : '', 
+            settings.semester, 
+            settings.school, 
+            (settings.grade && settings.classNo) ? `${settings.grade}年${settings.classNo}班` : 
+              (settings.grade ? `${settings.grade}年級` : (settings.classNo ? `${settings.classNo}班` : '')),
+            '掃地工作表'
+          ].filter(Boolean).join(' ')}
+        </h2>
       </div>
 
       <div className="table-container" style={{ boxShadow: 'none', border: '1px solid #e5e7eb' }}>
