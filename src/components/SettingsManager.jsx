@@ -22,11 +22,11 @@ function SettingsManager({ settings, setSettings }) {
           </div>
           <div style={{ flex: 1, minWidth: '150px' }}>
             <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>學校名稱</h4>
-            <input type="text" name="school" className="form-control" value={settings.school || ''} onChange={handleChange} placeholder="e.g. 麗園國小" />
+            <input type="text" name="school" className="form-control" value={settings.school || ''} onChange={handleChange} placeholder="e.g. 國小" />
           </div>
           <div style={{ flex: 1, minWidth: '120px' }}>
             <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>班級</h4>
-            <input type="text" name="className" className="form-control" value={settings.className || ''} onChange={handleChange} placeholder="e.g. 六年一班" />
+            <input type="text" name="className" className="form-control" value={settings.className || ''} onChange={handleChange} placeholder="e.g. 一年一班" />
           </div>
         </div>
 
