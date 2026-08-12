@@ -67,27 +67,37 @@ function AreaManager({ areas, setAreas, students }) {
                 <td>
                   <select 
                     className="form-control" 
-                    value={area.chief} 
+                    value={area.chief || ''} 
                     onChange={(e) => handleUpdateChief(area.id, 'chief', e.target.value)}
                     style={{ padding: '0.3rem' }}
                   >
                     <option value="">-- 無 --</option>
-                    {students.map(s => (
-                      isStudentSelectable(s.id, area.chief) && <option key={s.id} value={s.id}>{s.no} {s.name}</option>
-                    ))}
+                    {students.map(s => {
+                      const selectable = isStudentSelectable(s.id, area.chief);
+                      return (
+                        <option key={s.id} value={s.id} disabled={!selectable}>
+                          {s.no} {s.name} {!selectable ? '(已擔任其他股長)' : ''}
+                        </option>
+                      );
+                    })}
                   </select>
                 </td>
                 <td>
                   <select 
                     className="form-control" 
-                    value={area.deputy} 
+                    value={area.deputy || ''} 
                     onChange={(e) => handleUpdateChief(area.id, 'deputy', e.target.value)}
                     style={{ padding: '0.3rem' }}
                   >
                     <option value="">-- 無 --</option>
-                    {students.map(s => (
-                      isStudentSelectable(s.id, area.deputy) && <option key={s.id} value={s.id}>{s.no} {s.name}</option>
-                    ))}
+                    {students.map(s => {
+                      const selectable = isStudentSelectable(s.id, area.deputy);
+                      return (
+                        <option key={s.id} value={s.id} disabled={!selectable}>
+                          {s.no} {s.name} {!selectable ? '(已擔任其他股長)' : ''}
+                        </option>
+                      );
+                    })}
                   </select>
                 </td>
                 <td>
