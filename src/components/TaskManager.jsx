@@ -110,14 +110,14 @@ function TaskManager({ tasks, setTasks, areas }) {
           <tbody>
             {tasks.map(t => (
               <tr key={t.id}>
-                <td>{t.area}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{t.area}</td>
                 <td>
                   <input 
                     className="form-control" 
                     type="text" 
                     value={t.name} 
                     onChange={(e) => handleUpdate(t.id, 'name', e.target.value)} 
-                    style={{ padding: '0.2rem', width: '100%', minWidth: '150px' }}
+                    style={{ padding: '0.2rem', width: '100%', minWidth: '160px' }}
                   />
                 </td>
                 <td>
@@ -127,7 +127,7 @@ function TaskManager({ tasks, setTasks, areas }) {
                     value={t.count} 
                     min="1"
                     onChange={(e) => handleUpdate(t.id, 'count', e.target.value)} 
-                    style={{ padding: '0.2rem', width: '60px' }}
+                    style={{ padding: '0.2rem', width: '60px', minWidth: '60px' }}
                   />
                 </td>
                 <td>
@@ -135,15 +135,15 @@ function TaskManager({ tasks, setTasks, areas }) {
                     className="form-control" 
                     value={t.genderReq} 
                     onChange={(e) => handleUpdate(t.id, 'genderReq', e.target.value)} 
-                    style={{ padding: '0.2rem' }}
+                    style={{ padding: '0.2rem', minWidth: '95px' }}
                   >
                     <option value="無">性別不限</option>
                     <option value="限男生">限男生</option>
                     <option value="限女生">限女生</option>
                   </select>
                 </td>
-                <td>
-                  <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem' }} onClick={() => handleRemove(t.id)}>刪</button>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem' }} onClick={() => handleRemove(t.id)}>刪除</button>
                 </td>
               </tr>
             ))}
