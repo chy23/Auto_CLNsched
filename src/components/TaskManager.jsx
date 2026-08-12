@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function TaskManager({ tasks, setTasks }) {
+function TaskManager({ tasks, setTasks, areas }) {
   const handleAddTask = (e) => {
     e.preventDefault();
     const area = e.target.area.value;
@@ -11,7 +11,7 @@ function TaskManager({ tasks, setTasks }) {
     if (area && name && count) {
       setTasks([...tasks, { id: Date.now(), area, name, count, genderReq }]);
       e.target.name.value = '';
-      e.target.count.value = '';
+      e.target.count.value = '1';
     }
   };
 
@@ -24,26 +24,27 @@ function TaskManager({ tasks, setTasks }) {
       { id: 1, area: '外掃區', name: '活動中心北側紅磚及無障礙坡', count: 3, genderReq: '無' },
       { id: 2, area: '外掃區', name: '活動中心東側紅磚、花圃', count: 3, genderReq: '無' },
       { id: 3, area: '外掃區', name: '活動中心泳池出口之樓梯B1~4F', count: 2, genderReq: '無' },
-      { id: 4, area: '外掃區', name: '外掃股長_檢查外掃', count: 1, genderReq: '無' },
       { id: 5, area: '教室掃區', name: '黑板整理', count: 1, genderReq: '無' },
       { id: 6, area: '教室掃區', name: '教室桌椅、各項物品排整齊', count: 1, genderReq: '無' },
       { id: 7, area: '教室掃區', name: '廁所男生', count: 2, genderReq: '限男生' },
       { id: 8, area: '教室掃區', name: '廁所女生', count: 2, genderReq: '限女生' },
       { id: 9, area: '教室掃區', name: '倒垃圾', count: 1, genderReq: '無' },
     ];
+    // Notice I removed the old chief tasks (id 4 and something) since they are handled natively now
     setTasks(defaultTasks);
   };
 
   return (
     <div className="glass-card">
-      <h2 style={{ color: 'var(--secondary-color)' }}>🧹 掃區與工作設定</h2>
+      <h2 style={{ color: 'var(--secondary-color)' }}>🧹 工作設定</h2>
       
       <div style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
         <h4 style={{ marginBottom: '0.5rem' }}>新增打掃工作</h4>
         <form onSubmit={handleAddTask} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
           <select name="area" className="form-control" required>
-            <option value="教室掃區">教室掃區</option>
-            <option value="外掃區">外掃區</option>
+            {areas && areas.map(a => (
+              <option key={a.id} value={a.name}>{a.name}</option>
+            ))}
           </select>
           <input name="name" className="form-control" type="text" list="defaultTasksList" placeholder="工作名稱 (可選或輸入)" required />
           <datalist id="defaultTasksList">
@@ -60,9 +61,8 @@ function TaskManager({ tasks, setTasks }) {
             <option value="老師座位整理(每週1、4、5拖地)" />
             <option value="共用書櫃＋門把+布告欄 “整理” 及'擦拭'" />
             <option value="倒垃圾" />
-            <option value="衛生股長_檢查教室" />
           </datalist>
-          <input name="count" className="form-control" type="number" placeholder="人數" min="1" required />
+          <input name="count" className="form-control" type="number" placeholder="人數" min="1" defaultValue="1" required />
           <select name="genderReq" className="form-control" required>
             <option value="無">性別不限</option>
             <option value="限男生">限男生</option>

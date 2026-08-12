@@ -38,30 +38,45 @@ function ScheduleView({ schedule }) {
           </thead>
           <tbody>
             {Object.keys(groupedTasks).map((area, areaIndex) => (
-              groupedTasks[area].map((task, index) => (
-                <tr key={task.id}>
-                  {index === 0 && (
-                    <td 
-                      rowSpan={groupedTasks[area].length} 
-                      style={{ 
-                        borderRight: '1px solid #e5e7eb', 
-                        borderBottom: '1px solid #e5e7eb',
-                        verticalAlign: 'middle', 
-                        textAlign: 'center',
-                        fontWeight: 'bold',
-                        backgroundColor: areaIndex % 2 === 0 ? '#e0f2fe' : '#fce7f3'
-                      }}
-                    >
-                      {area}
+              groupedTasks[area].map((task, index) => {
+                const areaInfo = schedule.areasInfo ? schedule.areasInfo[area] : null;
+                return (
+                  <tr key={task.id}>
+                    {index === 0 && (
+                      <td 
+                        rowSpan={groupedTasks[area].length} 
+                        style={{ 
+                          borderRight: '1px solid #e5e7eb', 
+                          borderBottom: '1px solid #e5e7eb',
+                          verticalAlign: 'top', 
+                          textAlign: 'center',
+                          backgroundColor: areaIndex % 2 === 0 ? '#e0f2fe' : '#fce7f3',
+                          padding: '1rem 0.5rem'
+                        }}
+                      >
+                        <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{area}</div>
+                        {areaInfo && areaInfo.chiefName && (
+                          <div style={{ fontSize: '0.85rem', color: 'var(--primary-color)', marginBottom: '0.2rem' }}>
+                            <span style={{ border: '1px solid currentColor', borderRadius: '4px', padding: '0 2px', marginRight: '4px' }}>股長</span>
+                            {areaInfo.chiefName}
+                          </div>
+                        )}
+                        {areaInfo && areaInfo.deputyName && (
+                          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                            <span style={{ border: '1px solid currentColor', borderRadius: '4px', padding: '0 2px', marginRight: '4px' }}>代理</span>
+                            {areaInfo.deputyName}
+                          </div>
+                        )}
+                      </td>
+                    )}
+                    <td style={{ borderBottom: '1px solid #e5e7eb' }}>{task.name}</td>
+                    <td style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>{task.count}</td>
+                    <td style={{ borderBottom: '1px solid #e5e7eb' }}>
+                      {task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , ')}
                     </td>
-                  )}
-                  <td style={{ borderBottom: '1px solid #e5e7eb' }}>{task.name}</td>
-                  <td style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>{task.count}</td>
-                  <td style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    {task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , ')}
-                  </td>
-                </tr>
-              ))
+                  </tr>
+                );
+              })
             ))}
           </tbody>
         </table>
