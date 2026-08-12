@@ -65,7 +65,9 @@ function App() {
 
     const areasInfo = areas.reduce((acc, area) => {
       acc[area.name] = {
+        chiefId: area.chief,
         chiefName: getStudentName(area.chief),
+        deputyId: area.deputy,
         deputyName: getStudentName(area.deputy)
       };
       return acc;
@@ -204,7 +206,7 @@ function App() {
         )}
 
         {currentTab === 'schedule' && (
-          <ScheduleView schedule={schedule} />
+          <ScheduleView schedule={schedule} setSchedule={setSchedule} students={students} />
         )}
 
         {currentTab === 'checklist' && (

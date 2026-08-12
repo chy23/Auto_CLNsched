@@ -13,25 +13,35 @@ function ChecklistView({ schedule }) {
   // Create columns for dates (empty columns for the checklist)
   const columns = Array.from({ length: 10 }, (_, i) => i + 1);
 
+  // Group by area
+  const groupedTasks = schedule.assignments.reduce((acc, task) => {
+    if (!acc[task.area]) acc[task.area] = [];
+    acc[task.area].push(task);
+    return acc;
+  }, {});
+
   const exportToExcel = () => {
-    const data = [];
-    
-    // Header
-    const headerRow = ['打掃範圍', '姓名', ...columns.map(c => '')];
-    data.push(headerRow);
-    
-    // Data rows
-    schedule.assignments.forEach((task, index) => {
-      data.push([
-        `${index + 1}. ${task.name}`,
-        task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , '),
-        ...columns.map(c => '')
-      ]);
+    const wb = XLSX.utils.book_new();
+
+    Object.keys(groupedTasks).forEach(area => {
+      const data = [];
+      const headerRow = ['打掃範圍', '姓名', ...columns.map(c => '')];
+      data.push(headerRow);
+      
+      groupedTasks[area].forEach((task, index) => {
+        data.push([
+          `${index + 1}. ${task.name}`,
+          task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , '),
+          ...columns.map(c => '')
+        ]);
+      });
+      
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      // Ensure sheet name is valid and < 31 chars
+      const sheetName = area.substring(0, 31);
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
     });
     
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "檢核表");
     XLSX.writeFile(wb, `掃地工作檢核表_${schedule.date.replace(/\//g, '-')}.xlsx`);
   };
 
@@ -45,45 +55,47 @@ function ChecklistView({ schedule }) {
         </div>
       </div>
 
-      <div style={{ pageBreakInside: 'avoid' }}>
-        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          <h3 style={{ margin: 0 }}>掃地工作檢核表</h3>
-        </div>
-        
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          <span>* ✔️ 完成打掃</span>
-          <span>* ○ 打掃時間嬉鬧</span>
-          <span>* ❌ 未完成打掃</span>
-          <span>* △ 打掃不確實</span>
-        </div>
+      {Object.keys(groupedTasks).map(area => (
+        <div key={area} style={{ pageBreakInside: 'avoid', marginBottom: '3rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+            <h3 style={{ margin: 0 }}>掃地工作檢核表 - {area}</h3>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <span>* ✔️ 完成打掃</span>
+            <span>* ○ 打掃時間嬉鬧</span>
+            <span>* ❌ 未完成打掃</span>
+            <span>* △ 打掃不確實</span>
+          </div>
 
-        <div className="table-container" style={{ boxShadow: 'none', border: '1px solid #e5e7eb' }}>
-          <table className="table" style={{ borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f9fafb' }}>
-                <th style={{ width: '40%', borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>打掃範圍</th>
-                <th style={{ width: '20%', borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>姓名</th>
-                {columns.map(c => (
-                  <th key={c} style={{ width: '4%', borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}></th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {schedule.assignments.map((task, index) => (
-                <tr key={task.id}>
-                  <td style={{ borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>{index + 1}. {task.name}</td>
-                  <td style={{ borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>
-                    {task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , ')}
-                  </td>
+          <div className="table-container" style={{ boxShadow: 'none', border: '1px solid #e5e7eb' }}>
+            <table className="table" style={{ borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#f9fafb' }}>
+                  <th style={{ width: '40%', borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>打掃範圍</th>
+                  <th style={{ width: '20%', borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>姓名</th>
                   {columns.map(c => (
-                    <td key={c} style={{ borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}></td>
+                    <th key={c} style={{ width: '4%', borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}></th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {groupedTasks[area].map((task, index) => (
+                  <tr key={task.id}>
+                    <td style={{ borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>{index + 1}. {task.name}</td>
+                    <td style={{ borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}>
+                      {task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , ')}
+                    </td>
+                    {columns.map(c => (
+                      <td key={c} style={{ borderRight: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb' }}></td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      ))}
       
       <style>{`
         @media print {
