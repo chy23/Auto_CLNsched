@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import * as XLSX from 'xlsx';
 
 function StudentManager({ students, setStudents }) {
   const [inputData, setInputData] = useState('');
+  const fileInputRef = useRef(null);
 
   const handleAddRow = (e) => {
     e.preventDefault();
@@ -19,7 +21,6 @@ function StudentManager({ students, setStudents }) {
   };
 
   const handleBulkImport = () => {
-    // Basic CSV/Text parsing: each line "No Name Gender"
     const lines = inputData.split('\n');
     const newStudents = [];
     lines.forEach(line => {
@@ -43,21 +44,83 @@ function StudentManager({ students, setStudents }) {
     }
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const bstr = evt.target.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        
+        const newStudents = [];
+        // Skip header row if it contains text like "座號"
+        let startIndex = 0;
+        if (data[0] && (data[0][0] === '座號' || data[0][1] === '姓名')) {
+          startIndex = 1;
+        }
+
+        for (let i = startIndex; i < data.length; i++) {
+          const row = data[i];
+          if (row && row.length >= 3 && row[0] && row[1] && row[2]) {
+            newStudents.push({
+              id: Date.now() + Math.random(),
+              no: String(row[0]),
+              name: String(row[1]),
+              gender: String(row[2]).trim()
+            });
+          }
+        }
+
+        if (newStudents.length > 0) {
+          setStudents([...students, ...newStudents]);
+          alert(`成功從 Excel 匯入 ${newStudents.length} 筆資料`);
+        } else {
+          alert('Excel 內沒有找到有效資料，請確保前三欄為：座號、姓名、性別');
+        }
+      } catch (err) {
+        alert('解析 Excel 失敗，請確認檔案格式是否正確。');
+      }
+      // reset file input
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    reader.readAsBinaryString(file);
+  };
+
   return (
     <div className="glass-card">
       <h2 style={{ color: 'var(--primary-color)' }}>👥 學生名單管理</h2>
       
       <div style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
-        <h4 style={{ marginBottom: '0.5rem' }}>批次匯入 (座號 姓名 性別)</h4>
+        <h4 style={{ marginBottom: '0.5rem' }}>Excel / 批次匯入</h4>
+        
+        <div style={{ marginBottom: '1rem' }}>
+          <label className="btn btn-secondary" style={{ width: '100%', cursor: 'pointer' }}>
+            📁 點擊上傳 Excel 檔案 (.xlsx, .csv)
+            <input 
+              type="file" 
+              accept=".xlsx, .xls, .csv" 
+              onChange={handleFileUpload} 
+              ref={fileInputRef}
+              style={{ display: 'none' }} 
+            />
+          </label>
+        </div>
+
+        <h5 style={{ margin: '0.5rem 0', color: 'var(--text-muted)' }}>或手動貼上 (座號 姓名 性別)：</h5>
         <textarea 
           className="form-control" 
-          rows="4" 
+          rows="3" 
           placeholder={`範例：\n1 王大明 男\n2 陳小華 女`}
           value={inputData}
           onChange={(e) => setInputData(e.target.value)}
           style={{ marginBottom: '0.5rem' }}
         ></textarea>
-        <button className="btn btn-secondary" onClick={handleBulkImport}>匯入名單</button>
+        <button className="btn btn-secondary" onClick={handleBulkImport}>文字匯入名單</button>
       </div>
 
       <div style={{ marginBottom: '1.5rem' }}>

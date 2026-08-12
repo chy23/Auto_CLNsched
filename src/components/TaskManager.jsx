@@ -45,7 +45,23 @@ function TaskManager({ tasks, setTasks }) {
             <option value="教室掃區">教室掃區</option>
             <option value="外掃區">外掃區</option>
           </select>
-          <input name="name" className="form-control" type="text" placeholder="工作名稱" required />
+          <input name="name" className="form-control" type="text" list="defaultTasksList" placeholder="工作名稱 (可選或輸入)" required />
+          <datalist id="defaultTasksList">
+            <option value="黑板整理" />
+            <option value="教室桌椅、各項物品排整齊" />
+            <option value="窗戶" />
+            <option value="外走廊(拖+掃）(每週1、4、5拖地)" />
+            <option value="教室內掃地、拖地後走廊組(每週1、4、5拖地)" />
+            <option value="教室內掃地、拖地外走廊組(每週1、4、5拖地)" />
+            <option value="廁所男生" />
+            <option value="廁所女生" />
+            <option value="廁所洗手台、工具整理及各種雜物整理" />
+            <option value="後走廊打掃及整理後走廊掃具" />
+            <option value="老師座位整理(每週1、4、5拖地)" />
+            <option value="共用書櫃＋門把+布告欄 “整理” 及'擦拭'" />
+            <option value="倒垃圾" />
+            <option value="衛生股長_檢查教室" />
+          </datalist>
           <input name="count" className="form-control" type="number" placeholder="人數" min="1" required />
           <select name="genderReq" className="form-control" required>
             <option value="無">性別不限</option>
