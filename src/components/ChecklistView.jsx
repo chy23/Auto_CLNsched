@@ -90,6 +90,16 @@ function ChecklistView({ schedule, settings }) {
         { wch: 15 }, // student name
         ...columns.map(() => ({ wch: 5 })) // checkboxes
       ];
+      
+      const rulesLines = (settings.checklistRules || '').split('\n').length;
+      ws['!rows'] = [];
+      ws['!rows'][0] = { hpt: 30 };
+      ws['!rows'][1] = { hpt: Math.max(30, rulesLines * 16 + 10) };
+      
+      if (settings.extraNotes) {
+        const extraNotesLines = settings.extraNotes.split('\n').length;
+        ws['!rows'][data.length - 1] = { hpt: Math.max(30, extraNotesLines * 16 + 10) };
+      }
 
       const borderAll = {
         top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" }

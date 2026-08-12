@@ -174,7 +174,16 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
       { wch: 5 }, // count
       { wch: 40 } // students
     ];
-    ws['!rows'] = [{ hpt: 30 }, { hpt: 100 }];
+    
+    const rulesLines = (settings.scheduleRules || '').split('\n').length;
+    ws['!rows'] = [];
+    ws['!rows'][0] = { hpt: 30 };
+    ws['!rows'][1] = { hpt: Math.max(30, rulesLines * 16 + 10) };
+    
+    if (settings.extraNotes) {
+      const extraNotesLines = settings.extraNotes.split('\n').length;
+      ws['!rows'][data.length - 1] = { hpt: Math.max(30, extraNotesLines * 16 + 10) };
+    }
 
     const borderAll = {
       top: { style: "thin" }, bottom: { style: "thin" }, left: { style: "thin" }, right: { style: "thin" }
