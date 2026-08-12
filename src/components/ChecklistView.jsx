@@ -25,19 +25,67 @@ function ChecklistView({ schedule }) {
 
     Object.keys(groupedTasks).forEach(area => {
       const data = [];
-      const headerRow = ['打掃範圍', '姓名', ...columns.map(c => '')];
-      data.push(headerRow);
+      const merges = [];
       
+      const areaInfo = schedule.areasInfo ? schedule.areasInfo[area] : null;
+      let chiefStr = '';
+      if (areaInfo && areaInfo.chiefName) chiefStr += `股長：${areaInfo.chiefName} `;
+      if (areaInfo && areaInfo.deputyName) chiefStr += `【代理股長：${areaInfo.deputyName}】`;
+      
+      // Row 0: Title
+      data.push([`麗園國小掃地工作檢核表 - ${area}    ${chiefStr}`]);
+      merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: columns.length + 1 } });
+      
+      // Row 1: 打掃範圍 & Rules
+      const rules = "*✔️完成打掃\n*○打掃時間嬉鬧玩耍\n*❌未打掃\n*△打掃不確實";
+      data.push(['打掃範圍', '', rules]);
+      merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: 1 } }); // 打掃範圍 spans 2 cols
+      merges.push({ s: { r: 1, c: 2 }, e: { r: 1, c: columns.length + 1 } }); // rules spans remaining cols
+      
+      // Row 2: Headers
+      const headerRow = ['日期\n(e.g.9/1早、9/1下午)', '', '姓名', ...columns.map(c => '')];
+      data.push(headerRow);
+      merges.push({ s: { r: 2, c: 0 }, e: { r: 2, c: 1 } }); // 日期 spans 2 cols
+      
+      // Data rows
+      let currentRow = 3;
       groupedTasks[area].forEach((task, index) => {
-        data.push([
-          `${index + 1}. ${task.name}`,
-          task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , '),
-          ...columns.map(c => '')
-        ]);
+        const studentsCount = Math.max(1, task.assignedStudents.length);
+        
+        for (let i = 0; i < studentsCount; i++) {
+          const row = [];
+          if (i === 0) {
+            row.push(`${index + 1}`);
+            row.push(task.name);
+          } else {
+            row.push('');
+            row.push('');
+          }
+          
+          const student = task.assignedStudents[i];
+          row.push(student ? `${student.no}${student.name}` : '');
+          
+          columns.forEach(() => row.push('')); // empty checkbox cells
+          data.push(row);
+        }
+        
+        if (studentsCount > 1) {
+          merges.push({ s: { r: currentRow, c: 0 }, e: { r: currentRow + studentsCount - 1, c: 0 } });
+          merges.push({ s: { r: currentRow, c: 1 }, e: { r: currentRow + studentsCount - 1, c: 1 } });
+        }
+        
+        currentRow += studentsCount;
       });
       
       const ws = XLSX.utils.aoa_to_sheet(data);
-      // Ensure sheet name is valid and < 31 chars
+      ws['!merges'] = merges;
+      ws['!cols'] = [
+        { wch: 5 }, // index
+        { wch: 40 }, // task name
+        { wch: 15 }, // student name
+        ...columns.map(() => ({ wch: 5 })) // checkboxes
+      ];
+
       const sheetName = area.substring(0, 31);
       XLSX.utils.book_append_sheet(wb, ws, sheetName);
     });

@@ -36,7 +36,7 @@ function StudentManager({ students, setStudents }) {
           no: parts[0],
           name: parts[1],
           gender: parts[2],
-          arrival: parts[3] || '正常'
+          arrival: parts[3] || '早到'
         });
       }
     });
@@ -77,7 +77,7 @@ function StudentManager({ students, setStudents }) {
               no: String(row[0]),
               name: String(row[1]),
               gender: String(row[2]).trim(),
-              arrival: row[3] ? String(row[3]).trim() : '正常'
+              arrival: row[3] ? String(row[3]).trim() : '早到'
             });
           }
         }
@@ -120,7 +120,7 @@ function StudentManager({ students, setStudents }) {
         <textarea 
           className="form-control" 
           rows="3" 
-          placeholder={`範例：\n1 王大明 男 早到\n2 陳小華 女 正常\n3 林小美 女 晚到`}
+          placeholder={`範例：\n1 王大明 男 早到\n2 陳小華 女 早到\n3 林小美 女 晚到`}
           value={inputData}
           onChange={(e) => setInputData(e.target.value)}
           style={{ marginBottom: '0.5rem' }}
@@ -137,7 +137,6 @@ function StudentManager({ students, setStudents }) {
             <option value="女">女</option>
           </select>
           <select name="arrival" className="form-control" required style={{ width: '80px' }}>
-            <option value="正常">正常</option>
             <option value="早到">早到</option>
             <option value="晚到">晚到</option>
           </select>
@@ -171,11 +170,10 @@ function StudentManager({ students, setStudents }) {
                 <td>{s.gender}</td>
                 <td>
                   <select 
-                    value={s.arrival || '正常'} 
+                    value={s.arrival || '早到'} 
                     onChange={(e) => updateArrival(s.id, e.target.value)}
                     style={{ padding: '0.2rem', border: '1px solid #ccc', borderRadius: '4px' }}
                   >
-                    <option value="正常">正常</option>
                     <option value="早到">早到</option>
                     <option value="晚到">晚到</option>
                   </select>

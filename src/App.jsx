@@ -104,12 +104,11 @@ function App() {
       }
     }
 
-    // 3. Form pools: Early, Normal, Late
-    const earlyPool = availableStudents.filter(s => s.arrival === '早到').sort(() => Math.random() - 0.5);
-    const normalPool = availableStudents.filter(s => !s.arrival || s.arrival === '正常').sort(() => Math.random() - 0.5);
+    // 3. Form pools: Early, Late
+    const earlyPool = availableStudents.filter(s => !s.arrival || s.arrival === '早到' || s.arrival === '正常').sort(() => Math.random() - 0.5);
     const latePool = availableStudents.filter(s => s.arrival === '晚到').sort(() => Math.random() - 0.5);
 
-    const pools = [earlyPool, normalPool, latePool];
+    const pools = [earlyPool, latePool];
 
     for (const pool of pools) {
       let madeAssignment = true;

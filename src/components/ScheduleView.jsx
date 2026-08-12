@@ -57,22 +57,50 @@ function ScheduleView({ schedule, setSchedule, students }) {
 
   const exportToExcel = () => {
     const data = [];
-    data.push(['掃區', '打掃範圍', '人數', '負責同學']);
+    const merges = [];
     
+    // Row 0: Title
+    data.push(['麗園國小掃地工作表']);
+    merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } });
+    
+    // Row 1: Rules
+    const rules = "時段一：早上打掃時段\n（外掃：請於7:50離開掃區回班級。）\n未完成打掃請在大下課補完成\n時段二：掃地時間\n週一二四五14:50~15:10 周三10:10~10:30\n（請詳細完成掃地工作，並於掃地時間結束前3分鐘返回班級）";
+    data.push(['', '', '人數', rules]);
+    
+    // Data rows
+    let currentRow = 2;
     Object.keys(groupedTasks).forEach(area => {
       const areaInfo = schedule.areasInfo ? schedule.areasInfo[area] : null;
       let areaText = area;
-      if (areaInfo && areaInfo.chiefName) areaText += ` (股長:${areaInfo.chiefName})`;
-      if (areaInfo && areaInfo.deputyName) areaText += ` (代理:${areaInfo.deputyName})`;
       
-      groupedTasks[area].forEach((task, index) => {
+      const tasksInArea = groupedTasks[area];
+      
+      tasksInArea.forEach((task, index) => {
         data.push([
           index === 0 ? areaText : '',
-          task.name,
+          `${index + 1} ${task.name}`,
           task.count,
           task.assignedStudents.map(s => `${s.no}${s.name}`).join(' , ')
         ]);
       });
+      
+      // Chief row
+      if (areaInfo && (areaInfo.chiefName || areaInfo.deputyName)) {
+        let chiefText = [];
+        if (areaInfo.chiefName) chiefText.push(`股長：${areaInfo.chiefName}`);
+        if (areaInfo.deputyName) chiefText.push(`代理股長：${areaInfo.deputyName}`);
+        data.push([
+          '',
+          `${tasksInArea.length + 1} ${area}股長_檢查`,
+          '1',
+          chiefText.join(' , ')
+        ]);
+      }
+      
+      const totalRowsForArea = tasksInArea.length + (areaInfo && (areaInfo.chiefName || areaInfo.deputyName) ? 1 : 0);
+      merges.push({ s: { r: currentRow, c: 0 }, e: { r: currentRow + totalRowsForArea - 1, c: 0 } });
+      
+      currentRow += totalRowsForArea;
     });
     
     // Unassigned students section
@@ -83,6 +111,14 @@ function ScheduleView({ schedule, setSchedule, students }) {
     }
 
     const ws = XLSX.utils.aoa_to_sheet(data);
+    ws['!merges'] = merges;
+    ws['!cols'] = [
+      { wch: 10 }, // area
+      { wch: 40 }, // task name
+      { wch: 5 }, // count
+      { wch: 40 } // students
+    ];
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "總排班表");
     XLSX.writeFile(wb, `打掃總排班表_${schedule.date.replace(/\//g, '-')}.xlsx`);
