@@ -21,12 +21,20 @@ function TaskManager({ tasks, setTasks, areas }) {
 
   const loadDefaults = () => {
     const defaultTasks = [
-      { id: 5, area: '教室掃區', name: '黑板整理', count: 1, genderReq: '無' },
-      { id: 6, area: '教室掃區', name: '教室桌椅、各項物品排整齊', count: 1, genderReq: '無' },
+      { id: 1, area: '教室掃區', name: '黑板整理', count: 1, genderReq: '無' },
+      { id: 2, area: '教室掃區', name: '教室桌椅、各項物品排整齊', count: 1, genderReq: '無' },
+      { id: 3, area: '教室掃區', name: '窗戶', count: 1, genderReq: '無' },
+      { id: 4, area: '教室掃區', name: '外走廊(拖+掃）(每週1、4、5拖地)', count: 1, genderReq: '無' },
+      { id: 5, area: '教室掃區', name: '教室內掃地、拖地後走廊組(每週1、4、5拖地)', count: 1, genderReq: '無' },
+      { id: 6, area: '教室掃區', name: '教室內掃地、拖地外走廊組(每週1、4、5拖地)', count: 1, genderReq: '無' },
       { id: 7, area: '教室掃區', name: '廁所男生', count: 2, genderReq: '限男生' },
       { id: 8, area: '教室掃區', name: '廁所女生', count: 2, genderReq: '限女生' },
-      { id: 9, area: '教室掃區', name: '倒垃圾', count: 1, genderReq: '無' },
-      { id: 10, area: '教室掃區', name: '外走廊洗手台', count: 1, genderReq: '無' },
+      { id: 9, area: '教室掃區', name: '廁所洗手台、工具整理及各種雜物整理', count: 1, genderReq: '無' },
+      { id: 10, area: '教室掃區', name: '後走廊打掃及整理後走廊掃具', count: 1, genderReq: '無' },
+      { id: 11, area: '教室掃區', name: '老師座位整理(每週1、4、5拖地)', count: 1, genderReq: '無' },
+      { id: 12, area: '教室掃區', name: '共用書櫃＋門把+布告欄 “整理” 及\'擦拭\'', count: 1, genderReq: '無' },
+      { id: 13, area: '教室掃區', name: '倒垃圾', count: 1, genderReq: '無' },
+      { id: 14, area: '教室掃區', name: '外走廊洗手台', count: 1, genderReq: '無' },
     ];
     setTasks(defaultTasks);
   };

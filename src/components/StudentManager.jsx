@@ -12,7 +12,8 @@ function StudentManager({ students, setStudents }) {
     const gender = e.target.gender.value;
     const arrival = e.target.arrival.value;
     if (no && name && gender) {
-      setStudents([...students, { id: Date.now(), no, name, gender, arrival }]);
+      const safeId = Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 9);
+      setStudents([...students, { id: safeId, no, name, gender, arrival }]);
       e.target.reset();
     }
   };
@@ -31,8 +32,9 @@ function StudentManager({ students, setStudents }) {
     lines.forEach(line => {
       const parts = line.trim().split(/[\s,]+/);
       if (parts.length >= 3) {
+        const safeId = Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 9) + '-' + newStudents.length;
         newStudents.push({
-          id: Date.now() + Math.random(),
+          id: safeId,
           no: parts[0],
           name: parts[1],
           gender: parts[2],
@@ -72,8 +74,9 @@ function StudentManager({ students, setStudents }) {
         for (let i = startIndex; i < data.length; i++) {
           const row = data[i];
           if (row && row.length >= 3 && row[0] && row[1] && row[2]) {
+            const safeId = Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 9) + '-' + i;
             newStudents.push({
-              id: Date.now() + Math.random(),
+              id: safeId,
               no: String(row[0]),
               name: String(row[1]),
               gender: String(row[2]).trim(),
@@ -163,7 +166,7 @@ function StudentManager({ students, setStudents }) {
             </tr>
           </thead>
           <tbody>
-            {students.sort((a, b) => parseInt(a.no) - parseInt(b.no)).map(s => (
+            {[...students].sort((a, b) => parseInt(a.no) - parseInt(b.no)).map(s => (
               <tr key={s.id}>
                 <td>{s.no}</td>
                 <td>{s.name}</td>
