@@ -236,7 +236,12 @@ function App() {
   };
 
   return (
-    <div className="app-container animate-fade-in">
+    <div className="app-container animate-fade-in" style={{ position: 'relative' }}>
+      {/* Top right watermark */}
+      <div className="no-print" style={{ position: 'absolute', top: '5px', right: '20px', color: 'gray', opacity: 0.25, fontSize: '18pt', pointerEvents: 'none' }}>
+        網站建立自楊家驊老師
+      </div>
+
       <header className="no-print" style={{ marginBottom: '2rem', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}>✨ 自動打掃排班系統</h1>
         <p style={{ color: 'var(--text-muted)' }}>輕鬆分配打掃工作，一鍵產生排班表與檢核表</p>
@@ -298,6 +303,11 @@ function App() {
           <ChecklistView schedule={schedule} settings={settings} />
         )}
       </main>
+
+      {/* Bottom right watermark */}
+      <div className="no-print" style={{ position: 'absolute', bottom: '5px', right: '20px', color: 'gray', opacity: 0.25, fontSize: '18pt', pointerEvents: 'none' }}>
+        網站建立自楊家驊老師
+      </div>
     </div>
   );
 }
