@@ -5,6 +5,7 @@ import AreaManager from './components/AreaManager';
 import ScheduleView from './components/ScheduleView';
 import ChecklistView from './components/ChecklistView';
 import SettingsManager from './components/SettingsManager';
+import ChangelogModal from './components/ChangelogModal';
 import './App.css';
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
   });
 
   const [currentTab, setCurrentTab] = useState('setup');
+  const [isChangelogOpen, setIsChangelogOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('students', JSON.stringify(students));
@@ -242,7 +244,19 @@ function App() {
         網站建立自楊家驊老師
       </div>
 
-      <header className="no-print" style={{ marginBottom: '2rem', textAlign: 'center' }}>
+      <header className="no-print" style={{ marginBottom: '2rem', textAlign: 'center', position: 'relative' }}>
+        <button 
+          onClick={() => setIsChangelogOpen(true)}
+          style={{ 
+            position: 'absolute', top: 0, right: 0, 
+            background: 'none', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', 
+            padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-sm)', cursor: 'pointer',
+            fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem'
+          }}
+          title="系統更新紀錄與版本號"
+        >
+          📜 更新紀錄
+        </button>
         <h1 style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}>✨ 自動打掃排班系統</h1>
         <p style={{ color: 'var(--text-muted)' }}>輕鬆分配打掃工作，一鍵產生排班表與檢核表</p>
         
@@ -303,6 +317,8 @@ function App() {
           <ChecklistView schedule={schedule} settings={settings} />
         )}
       </main>
+
+      <ChangelogModal isOpen={isChangelogOpen} onClose={() => setIsChangelogOpen(false)} />
 
       {/* Bottom right watermark */}
       <div className="no-print" style={{ position: 'absolute', bottom: '5px', right: '20px', color: 'gray', opacity: 0.25, fontSize: '18pt', pointerEvents: 'none' }}>

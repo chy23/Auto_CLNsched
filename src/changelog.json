@@ -1,0 +1,140 @@
+[
+  {
+    "version": "v1.0.23",
+    "date": "2026-08-13",
+    "title": "Add watermark to top-right and bottom-right",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.22",
+    "date": "2026-08-12",
+    "title": "Update print layout to match Excel styling",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.21",
+    "date": "2026-08-12",
+    "title": "Implement optimizations: smart rotation, export/import settings, UX enhancements, and fix row heights",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.20",
+    "date": "2026-08-12",
+    "title": "Change class name to grade and class number dropdowns, semester to dropdown",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.19",
+    "date": "2026-08-12",
+    "title": "Update default settings for titles (empty year/class, default school to '國小')",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.18",
+    "date": "2026-08-12",
+    "title": "Add customizable title fields (year, semester, school, class)",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.17",
+    "date": "2026-08-12",
+    "title": "Auto-adjust Excel row heights for multi-line rules and notes",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.16",
+    "date": "2026-08-12",
+    "title": "Increase checklist columns to 25",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.15",
+    "date": "2026-08-12",
+    "title": "Fix layout squishing in task manager table",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.14",
+    "date": "2026-08-12",
+    "title": "Add settings manager for customizable report text and notes",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.13",
+    "date": "2026-08-12",
+    "title": "Assign classroom deputy to specific preferred tasks",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.12",
+    "date": "2026-08-12",
+    "title": "Allow editing of task name, count, and gender restrictions",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.11",
+    "date": "2026-08-12",
+    "title": "Fix duplicate ID precision bug and expand default tasks",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.10",
+    "date": "2026-08-12",
+    "title": "Fix chief select jump issue by disabling options instead of removing them",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.9",
+    "date": "2026-08-12",
+    "title": "Implement drag and drop and strictly formatted Excel exports",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.8",
+    "date": "2026-08-12",
+    "title": "Update Excel formatting to match PDF and streamline arrival times",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.7",
+    "date": "2026-08-12",
+    "title": "Implement manual schedule adjustment and area-specific checklists",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.6",
+    "date": "2026-08-12",
+    "title": "Update default tasks and restrict chief selection",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.5",
+    "date": "2026-08-12",
+    "title": "Implement early/late round robin assignment and Excel export",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.4",
+    "date": "2026-08-12",
+    "title": "Implement dynamic areas, chief exclusions, and deputy assignments",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.3",
+    "date": "2026-08-12",
+    "title": "Add Excel import and task datalist",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.2",
+    "date": "2026-08-12",
+    "title": "Configure GitHub Pages deployment",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.1",
+    "date": "2026-08-12",
+    "title": "Initial commit",
+    "details": "無詳細說明"
+  }
+]
