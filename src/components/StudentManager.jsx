@@ -133,35 +133,20 @@ function StudentManager({ students, setStudents }) {
 
       <h2 style={{ color: 'var(--primary-color)' }}>🧑‍🎓 學生名單</h2>
       
-      <div className="form-group" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-        <input 
-          type="text" 
-          className="form-control" 
-          placeholder="座號 (e.g. 01)" 
-          value={newStudent.no} 
-          onChange={e => setNewStudent({...newStudent, no: e.target.value})}
-          style={{ width: '80px' }}
-          onKeyPress={(e) => e.key === 'Enter' && handleAddStudent()}
-        />
-        <input 
-          type="text" 
-          className="form-control" 
-          placeholder="姓名" 
-          value={newStudent.name} 
-          onChange={e => setNewStudent({...newStudent, name: e.target.value})}
-          style={{ flex: 1 }}
-          onKeyPress={(e) => e.key === 'Enter' && handleAddStudent()}
-        />
-        <select 
-          className="form-control" 
-          value={newStudent.gender} 
-          onChange={e => setNewStudent({...newStudent, gender: e.target.value})}
-          style={{ width: '80px' }}
-        >
-          <option value="男">男</option>
-          <option value="女">女</option>
-        </select>
-        <button className="btn btn-primary" onClick={handleAddStudent}>新增</button>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <form onSubmit={handleAddRow} style={{ display: 'flex', gap: '0.5rem' }}>
+          <input name="no" className="form-control" type="number" placeholder="座號" required style={{ width: '60px' }} />
+          <input name="name" className="form-control" type="text" placeholder="姓名" required style={{ flex: 1 }} />
+          <select name="gender" className="form-control" required style={{ width: '60px' }}>
+            <option value="男">男</option>
+            <option value="女">女</option>
+          </select>
+          <select name="arrival" className="form-control" required style={{ width: '80px' }}>
+            <option value="早到">早到</option>
+            <option value="晚到">晚到</option>
+          </select>
+          <button type="submit" className="btn btn-primary">+</button>
+        </form>
       </div>
 
       <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>

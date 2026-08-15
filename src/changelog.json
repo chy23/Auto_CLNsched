@@ -1,5 +1,11 @@
 [
   {
+    "version": "v1.0.25",
+    "date": "2026-08-15",
+    "title": "UI/UX Upgrade: Segmented control, custom Toast and Confirm modals, Drag & Drop feedback, Empty states, and Micro-animations",
+    "details": "無詳細說明"
+  },
+  {
     "version": "v1.0.24",
     "date": "2026-08-14",
     "title": "Add automated Changelog modal using git history",
