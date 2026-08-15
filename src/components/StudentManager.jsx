@@ -131,68 +131,76 @@ function StudentManager({ students, setStudents }) {
         <button className="btn btn-secondary" onClick={handleBulkImport}>文字匯入名單</button>
       </div>
 
-      <div style={{ marginBottom: '1.5rem' }}>
-        <form onSubmit={handleAddRow} style={{ display: 'flex', gap: '0.5rem' }}>
-          <input name="no" className="form-control" type="number" placeholder="座號" required style={{ width: '60px' }} />
-          <input name="name" className="form-control" type="text" placeholder="姓名" required style={{ flex: 1 }} />
-          <select name="gender" className="form-control" required style={{ width: '60px' }}>
-            <option value="男">男</option>
-            <option value="女">女</option>
-          </select>
-          <select name="arrival" className="form-control" required style={{ width: '80px' }}>
-            <option value="早到">早到</option>
-            <option value="晚到">晚到</option>
-          </select>
-          <button type="submit" className="btn btn-primary">+</button>
-        </form>
+      <h2 style={{ color: 'var(--primary-color)' }}>🧑‍🎓 學生名單</h2>
+      
+      <div className="form-group" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+        <input 
+          type="text" 
+          className="form-control" 
+          placeholder="座號 (e.g. 01)" 
+          value={newStudent.no} 
+          onChange={e => setNewStudent({...newStudent, no: e.target.value})}
+          style={{ width: '80px' }}
+          onKeyPress={(e) => e.key === 'Enter' && handleAddStudent()}
+        />
+        <input 
+          type="text" 
+          className="form-control" 
+          placeholder="姓名" 
+          value={newStudent.name} 
+          onChange={e => setNewStudent({...newStudent, name: e.target.value})}
+          style={{ flex: 1 }}
+          onKeyPress={(e) => e.key === 'Enter' && handleAddStudent()}
+        />
+        <select 
+          className="form-control" 
+          value={newStudent.gender} 
+          onChange={e => setNewStudent({...newStudent, gender: e.target.value})}
+          style={{ width: '80px' }}
+        >
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+        <button className="btn btn-primary" onClick={handleAddStudent}>新增</button>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-        <span>共 {students.length} 人</span>
-        {students.length > 0 && (
-          <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }} onClick={() => setStudents([])}>清空名單</button>
-        )}
-      </div>
-
-      <div className="table-container" style={{ maxHeight: '300px' }}>
-        <table className="table">
-          <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>
-            <tr>
-              <th>座號</th>
-              <th>姓名</th>
-              <th>性別</th>
-              <th>到校時間</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[...students].sort((a, b) => parseInt(a.no) - parseInt(b.no)).map(s => (
-              <tr key={s.id}>
-                <td>{s.no}</td>
-                <td>{s.name}</td>
-                <td>{s.gender}</td>
-                <td>
+      <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+        {students.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 'var(--radius-md)', border: '1px dashed #ccc' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👋</div>
+            <h4 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>目前還沒有學生名單喔！</h4>
+            <p style={{ fontSize: '0.9rem' }}>請在上方輸入座號與姓名，開始建立您的班級名單。</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span>共 {students.length} 人</span>
+              {students.length > 0 && (
+                <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }} onClick={() => setStudents([])}>清空名單</button>
+              )}
+            </div>
+            {[...students].sort((a, b) => parseInt(a.no) - parseInt(b.no)).map(student => (
+              <div key={student.id} style={{ display: 'flex', gap: '0.5rem', padding: '0.5rem', background: '#fff', borderRadius: '4px', border: '1px solid #eee' }}>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <strong>{student.no}</strong>
+                  <span>{student.name}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#666' }}>({student.gender})</span>
+                </div>
+                <div>
                   <select 
-                    value={s.arrival || '早到'} 
-                    onChange={(e) => updateArrival(s.id, e.target.value)}
+                    value={student.arrival || '早到'} 
+                    onChange={(e) => updateArrival(student.id, e.target.value)}
                     style={{ padding: '0.2rem', border: '1px solid #ccc', borderRadius: '4px' }}
                   >
                     <option value="早到">早到</option>
                     <option value="晚到">晚到</option>
                   </select>
-                </td>
-                <td>
-                  <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem' }} onClick={() => handleRemove(s.id)}>刪</button>
-                </td>
-              </tr>
+                </div>
+                <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem', alignSelf: 'center' }} onClick={() => handleRemove(student.id)}>刪除</button>
+              </div>
             ))}
-            {students.length === 0 && (
-              <tr>
-                <td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>尚無學生資料</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+          </div>
+        )}
       </div>
     </div>
   );

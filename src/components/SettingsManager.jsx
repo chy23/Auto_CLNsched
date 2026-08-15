@@ -1,6 +1,6 @@
 import React from 'react';
 
-function SettingsManager({ settings, setSettings, students, setStudents, tasks, setTasks, areas, setAreas }) {
+function SettingsManager({ settings, setSettings, students, setStudents, tasks, setTasks, areas, setAreas, showToast }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSettings(prev => ({ ...prev, [name]: value }));
@@ -29,9 +29,9 @@ function SettingsManager({ settings, setSettings, students, setStudents, tasks, 
         if (data.tasks) setTasks(data.tasks);
         if (data.areas) setAreas(data.areas);
         if (data.settings) setSettings(data.settings);
-        alert('✅ 設定檔匯入成功！');
+        showToast('✅ 設定檔匯入成功！', 'success');
       } catch (err) {
-        alert('❌ 檔案格式錯誤，匯入失敗。');
+        showToast('❌ 檔案格式錯誤，匯入失敗。', 'error');
       }
     };
     reader.readAsText(file);

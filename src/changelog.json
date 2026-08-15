@@ -1,5 +1,11 @@
 [
   {
+    "version": "v1.0.24",
+    "date": "2026-08-14",
+    "title": "Add automated Changelog modal using git history",
+    "details": "無詳細說明"
+  },
+  {
     "version": "v1.0.23",
     "date": "2026-08-13",
     "title": "Add watermark to top-right and bottom-right",

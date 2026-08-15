@@ -6,6 +6,8 @@ import ScheduleView from './components/ScheduleView';
 import ChecklistView from './components/ChecklistView';
 import SettingsManager from './components/SettingsManager';
 import ChangelogModal from './components/ChangelogModal';
+import Toast from './components/Toast';
+import ConfirmModal from './components/ConfirmModal';
 import './App.css';
 
 function App() {
@@ -53,6 +55,14 @@ function App() {
 
   const [currentTab, setCurrentTab] = useState('setup');
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     localStorage.setItem('students', JSON.stringify(students));
@@ -79,11 +89,8 @@ function App() {
   }, [history]);
 
   const generateSchedule = () => {
+    // Save current schedule to history if exists
     if (schedule) {
-      const confirmRegenerate = window.confirm("您確定要重新產生排班表嗎？\n這將會覆蓋您目前的微調結果。\n（系統會自動將目前的排班表記憶為歷史紀錄，並盡量安排輪替不同的工作）");
-      if (!confirmRegenerate) return;
-      
-      // Save current schedule to history
       setHistory(schedule);
     }
     
@@ -225,6 +232,7 @@ function App() {
     const unfilledTasks = taskState.filter(t => t.remaining > 0);
     if (unfilledTasks.length > 0) {
       alert('排班失敗：學生人數不足或無法滿足性別條件。請檢查您的名單與工作設定。');
+      setIsGenerating(false);
       return;
     }
 
@@ -234,7 +242,27 @@ function App() {
       areasInfo: areasInfo
     });
     
-    setCurrentTab('schedule');
+    // Fake loading delay for better UX
+    setTimeout(() => {
+      setIsGenerating(false);
+      showToast('✅ 排班完成！', 'success');
+      setCurrentTab('schedule');
+    }, 600);
+  };
+
+  const handleGenerateClick = () => {
+    if (schedule) {
+      setIsConfirmOpen(true);
+    } else {
+      executeGenerate();
+    }
+  };
+
+  const executeGenerate = () => {
+    setIsConfirmOpen(false);
+    setIsGenerating(true);
+    // Use timeout to allow UI to re-render to "isGenerating" state before blocking the main thread
+    setTimeout(generateSchedule, 50);
   };
 
   return (
@@ -260,25 +288,27 @@ function App() {
         <h1 style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}>✨ 自動打掃排班系統</h1>
         <p style={{ color: 'var(--text-muted)' }}>輕鬆分配打掃工作，一鍵產生排班表與檢核表</p>
         
-        <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <button 
-            className={`btn ${currentTab === 'setup' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setCurrentTab('setup')}
-          >
-            設定區 (學生與工作)
-          </button>
-          <button 
-            className={`btn ${currentTab === 'schedule' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setCurrentTab('schedule')}
-          >
-            總排班表
-          </button>
-          <button 
-            className={`btn ${currentTab === 'checklist' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setCurrentTab('checklist')}
-          >
-            檢核表列印
-          </button>
+        <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+          <div className="segmented-control">
+            <button 
+              className={`segment-btn ${currentTab === 'setup' ? 'active' : ''}`}
+              onClick={() => setCurrentTab('setup')}
+            >
+              ⚙️ 設定區
+            </button>
+            <button 
+              className={`segment-btn ${currentTab === 'schedule' ? 'active' : ''}`}
+              onClick={() => setCurrentTab('schedule')}
+            >
+              📅 總排班表
+            </button>
+            <button 
+              className={`segment-btn ${currentTab === 'checklist' ? 'active' : ''}`}
+              onClick={() => setCurrentTab('checklist')}
+            >
+              📋 檢核表列印
+            </button>
+          </div>
         </div>
       </header>
 
@@ -295,15 +325,22 @@ function App() {
               students={students} setStudents={setStudents}
               tasks={tasks} setTasks={setTasks}
               areas={areas} setAreas={setAreas}
+              showToast={showToast}
             />
             
             <div style={{ textAlign: 'center', marginTop: '2rem' }} className="no-print">
               <button 
                 className="btn btn-primary" 
-                style={{ padding: '1rem 3rem', fontSize: '1.2rem' }}
-                onClick={generateSchedule}
+                style={{ 
+                  padding: '1rem 3rem', fontSize: '1.2rem',
+                  transform: isGenerating ? 'scale(0.98)' : 'scale(1)',
+                  opacity: isGenerating ? 0.8 : 1,
+                  transition: 'all 0.2s'
+                }}
+                onClick={handleGenerateClick}
+                disabled={isGenerating}
               >
-                自動產生排班表 🚀
+                {isGenerating ? '✨ 魔法排班中...' : '自動產生排班表 🚀'}
               </button>
             </div>
           </>
@@ -319,6 +356,14 @@ function App() {
       </main>
 
       <ChangelogModal isOpen={isChangelogOpen} onClose={() => setIsChangelogOpen(false)} />
+      <ConfirmModal 
+        isOpen={isConfirmOpen} 
+        title="確認重新產生排班表？"
+        message={`這將會覆蓋您目前手動微調的結果。\n\n（系統會自動將目前的排班表記憶為歷史紀錄，並在下次排班時盡量安排學生輪替不同的工作）`}
+        onConfirm={executeGenerate}
+        onCancel={() => setIsConfirmOpen(false)}
+      />
+      {toast && <Toast message={toast.msg} type={toast.type} />}
 
       {/* Bottom right watermark */}
       <div className="no-print" style={{ position: 'absolute', bottom: '5px', right: '20px', color: 'gray', opacity: 0.25, fontSize: '18pt', pointerEvents: 'none' }}>

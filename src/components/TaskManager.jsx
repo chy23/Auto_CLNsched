@@ -147,13 +147,15 @@ function TaskManager({ tasks, setTasks, areas }) {
                 </td>
               </tr>
             ))}
-            {tasks.length === 0 && (
-              <tr>
-                <td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>尚無工作設定</td>
-              </tr>
-            )}
           </tbody>
         </table>
+        {tasks.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 'var(--radius-md)', border: '1px dashed #ccc', marginTop: '1rem' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🧹</div>
+            <h4 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>目前還沒有設定工作項目！</h4>
+            <p style={{ fontSize: '0.9rem' }}>您可以點擊上方「載入範例」快速建立，或是自行新增打掃工作。</p>
+          </div>
+        )}
       </div>
     </div>
   );

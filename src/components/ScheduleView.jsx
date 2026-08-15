@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as XLSX from 'xlsx-js-style';
 
 function ScheduleView({ schedule, setSchedule, students, settings }) {
+  const [dragOverId, setDragOverId] = useState(null);
+
   if (!schedule) {
     return (
       <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -34,12 +36,23 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
     e.dataTransfer.setData("sourceTaskId", sourceTaskId || 'unassigned');
   };
 
-  const onDragOver = (e) => {
+  const handleDragOver = (e, id) => {
     e.preventDefault();
+    if (dragOverId !== id) {
+      setDragOverId(id);
+    }
+  };
+
+  const handleDragLeave = (e, id) => {
+    e.preventDefault();
+    if (dragOverId === id) {
+      setDragOverId(null);
+    }
   };
 
   const onDropToUnassigned = (e) => {
     e.preventDefault();
+    setDragOverId(null);
     const studentId = e.dataTransfer.getData("studentId");
     const sourceTaskId = e.dataTransfer.getData("sourceTaskId");
     if (sourceTaskId !== 'unassigned') {
@@ -49,6 +62,7 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
 
   const onDropToTask = (e, targetTaskId) => {
     e.preventDefault();
+    setDragOverId(null);
     const studentId = e.dataTransfer.getData("studentId");
     const sourceTaskId = e.dataTransfer.getData("sourceTaskId");
     
@@ -248,8 +262,16 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
       {unassignedStudents.length > 0 && (
         <div 
           className="no-print" 
-          style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#fef3c7', borderRadius: '8px', border: '1px dashed #f59e0b', minHeight: '80px' }}
-          onDragOver={onDragOver}
+          style={{ 
+            marginBottom: '1rem', 
+            padding: '1rem', 
+            borderRadius: '8px', 
+            transition: 'all 0.2s',
+            backgroundColor: dragOverId === 'unassigned' ? '#fef3c7' : '#fef3c7', 
+            border: dragOverId === 'unassigned' ? '2px dashed #f59e0b' : '1px dashed #f59e0b' 
+          }}
+          onDragOver={(e) => handleDragOver(e, 'unassigned')}
+          onDragLeave={(e) => handleDragLeave(e, 'unassigned')}
           onDrop={onDropToUnassigned}
         >
           <h4 style={{ color: '#92400e', marginBottom: '0.5rem', marginTop: 0 }}>⚠️ 尚未分配工作的學生（備用名單）：</h4>
@@ -365,10 +387,15 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
                       )}
                       <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb' }}>{task.name}</td>
                       <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb', textAlign: 'center' }}>{task.count}</td>
-                      <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb' }}>
+                      <td className="print-cell" style={{ borderBottom: '1px solid #e5e7eb', padding: 0 }}>
                         <div 
-                          style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', minHeight: '30px' }}
-                          onDragOver={onDragOver}
+                          style={{ 
+                            display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', 
+                            minHeight: '100%', padding: '1rem', transition: 'all 0.2s',
+                            backgroundColor: dragOverId === task.id ? '#fef3c7' : 'transparent'
+                          }}
+                          onDragOver={(e) => handleDragOver(e, task.id)}
+                          onDragLeave={(e) => handleDragLeave(e, task.id)}
                           onDrop={(e) => onDropToTask(e, task.id)}
                         >
                           {task.assignedStudents.map(s => (
