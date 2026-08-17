@@ -1,5 +1,11 @@
 [
   {
+    "version": "v1.0.26",
+    "date": "2026-08-15",
+    "title": "Hotfix: Fix undefined newStudent state in StudentManager causing blank screen",
+    "details": "無詳細說明"
+  },
+  {
     "version": "v1.0.25",
     "date": "2026-08-15",
     "title": "UI/UX Upgrade: Segmented control, custom Toast and Confirm modals, Drag & Drop feedback, Empty states, and Micro-animations",
