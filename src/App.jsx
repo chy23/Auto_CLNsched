@@ -8,6 +8,7 @@ import SettingsManager from './components/SettingsManager';
 import ChangelogModal from './components/ChangelogModal';
 import Toast from './components/Toast';
 import ConfirmModal from './components/ConfirmModal';
+import ExportImportModal from './components/ExportImportModal';
 import './App.css';
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
 
   const [currentTab, setCurrentTab] = useState('setup');
   const [isChangelogOpen, setIsChangelogOpen] = useState(false);
+  const [isExportImportOpen, setIsExportImportOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -273,18 +275,30 @@ function App() {
       </div>
 
       <header className="no-print" style={{ marginBottom: '2rem', textAlign: 'center', position: 'relative' }}>
-        <button 
-          onClick={() => setIsChangelogOpen(true)}
-          style={{ 
-            position: 'absolute', top: 0, right: 0, 
-            background: 'none', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', 
-            padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-sm)', cursor: 'pointer',
-            fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem'
-          }}
-          title="系統更新紀錄與版本號"
-        >
-          📜 更新紀錄
-        </button>
+        <div style={{ position: 'absolute', top: 0, right: 0, display: 'flex', gap: '0.5rem' }}>
+          <button 
+            onClick={() => setIsExportImportOpen(true)}
+            style={{ 
+              background: 'none', border: '1px solid #10b981', color: '#10b981', 
+              padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-sm)', cursor: 'pointer',
+              fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem'
+            }}
+            title="資料備份與還原"
+          >
+            💾 備份/還原
+          </button>
+          <button 
+            onClick={() => setIsChangelogOpen(true)}
+            style={{ 
+              background: 'none', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', 
+              padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-sm)', cursor: 'pointer',
+              fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem'
+            }}
+            title="系統更新紀錄與版本號"
+          >
+            📜 更新紀錄
+          </button>
+        </div>
         <h1 style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}>✨ 自動打掃排班系統</h1>
         <p style={{ color: 'var(--text-muted)' }}>輕鬆分配打掃工作，一鍵產生排班表與檢核表</p>
         
@@ -356,6 +370,13 @@ function App() {
       </main>
 
       <ChangelogModal isOpen={isChangelogOpen} onClose={() => setIsChangelogOpen(false)} />
+      <ExportImportModal 
+        isOpen={isExportImportOpen} 
+        onClose={() => setIsExportImportOpen(false)} 
+        appData={{ students, tasks, areas, settings }}
+        setAppData={{ setStudents, setTasks, setAreas, setSettings }}
+        showToast={showToast}
+      />
       <ConfirmModal 
         isOpen={isConfirmOpen} 
         title="確認重新產生排班表？"

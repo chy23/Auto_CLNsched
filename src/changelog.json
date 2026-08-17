@@ -1,5 +1,11 @@
 [
   {
+    "version": "v1.0.27",
+    "date": "2026-08-17",
+    "title": "Update favicon with custom icon and fix document title",
+    "details": "無詳細說明"
+  },
+  {
     "version": "v1.0.26",
     "date": "2026-08-15",
     "title": "Hotfix: Fix undefined newStudent state in StudentManager causing blank screen",
