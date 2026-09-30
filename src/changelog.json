@@ -1,5 +1,17 @@
 [
   {
+    "version": "v1.0.30",
+    "date": "2026-08-21",
+    "title": "Test push from new computer",
+    "details": "無詳細說明"
+  },
+  {
+    "version": "v1.0.29",
+    "date": "2026-08-18",
+    "title": "chore: add .nojekyll for gh-pages and update changelog",
+    "details": "無詳細說明"
+  },
+  {
     "version": "v1.0.28",
     "date": "2026-08-18",
     "title": "Feature: Advanced Export/Import Modal for selective data backup and restore",

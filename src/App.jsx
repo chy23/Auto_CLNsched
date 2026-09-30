@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Save, History, Sparkles, Settings, CalendarDays, ClipboardList, Loader2 } from 'lucide-react';
 import StudentManager from './components/StudentManager';
 import TaskManager from './components/TaskManager';
 import AreaManager from './components/AreaManager';
@@ -285,7 +286,7 @@ function App() {
             }}
             title="資料備份與還原"
           >
-            💾 備份/還原
+            <Save size={16} /> 備份/還原
           </button>
           <button 
             onClick={() => setIsChangelogOpen(true)}
@@ -296,10 +297,12 @@ function App() {
             }}
             title="系統更新紀錄與版本號"
           >
-            📜 更新紀錄
+            <History size={16} /> 更新紀錄
           </button>
         </div>
-        <h1 style={{ fontSize: '2.5rem', color: 'var(--primary-color)' }}>✨ 自動打掃排班系統</h1>
+        <h1 style={{ fontSize: '2.5rem', color: 'var(--primary-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+          <Sparkles size={36} /> 自動打掃排班系統
+        </h1>
         <p style={{ color: 'var(--text-muted)' }}>輕鬆分配打掃工作，一鍵產生排班表與檢核表</p>
         
         <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center' }}>
@@ -307,20 +310,23 @@ function App() {
             <button 
               className={`segment-btn ${currentTab === 'setup' ? 'active' : ''}`}
               onClick={() => setCurrentTab('setup')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              ⚙️ 設定區
+              <Settings size={18} /> 設定區
             </button>
             <button 
               className={`segment-btn ${currentTab === 'schedule' ? 'active' : ''}`}
               onClick={() => setCurrentTab('schedule')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              📅 總排班表
+              <CalendarDays size={18} /> 總排班表
             </button>
             <button 
               className={`segment-btn ${currentTab === 'checklist' ? 'active' : ''}`}
               onClick={() => setCurrentTab('checklist')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              📋 檢核表列印
+              <ClipboardList size={18} /> 檢核表列印
             </button>
           </div>
         </div>
@@ -349,12 +355,25 @@ function App() {
                   padding: '1rem 3rem', fontSize: '1.2rem',
                   transform: isGenerating ? 'scale(0.98)' : 'scale(1)',
                   opacity: isGenerating ? 0.8 : 1,
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  minWidth: '280px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem'
                 }}
                 onClick={handleGenerateClick}
                 disabled={isGenerating}
               >
-                {isGenerating ? '✨ 魔法排班中...' : '自動產生排班表 🚀'}
+                {isGenerating ? (
+                  <>
+                    <Loader2 size={24} className="animate-spin" /> 排班處理中...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={24} /> 自動產生排班表
+                  </>
+                )}
               </button>
             </div>
           </>

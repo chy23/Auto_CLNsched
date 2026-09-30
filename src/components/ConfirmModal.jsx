@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 function ConfirmModal({ isOpen, title, message, onConfirm, onCancel }) {
   if (!isOpen) return null;
@@ -14,8 +15,8 @@ function ConfirmModal({ isOpen, title, message, onConfirm, onCancel }) {
         width: '90%', maxWidth: '400px', backgroundColor: 'white', 
         padding: '2rem', textAlign: 'center'
       }}>
-        <h3 style={{ color: '#d97706', marginBottom: '1rem', fontSize: '1.4rem' }}>
-          ⚠️ {title}
+        <h3 style={{ color: '#d97706', marginBottom: '1rem', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+          <AlertTriangle size={24} /> {title}
         </h3>
         <p style={{ color: 'var(--text-main)', marginBottom: '2rem', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
           {message}

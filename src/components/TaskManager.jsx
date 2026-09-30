@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Briefcase, ListPlus, Trash2, CheckCircle2 } from 'lucide-react';
 
 function TaskManager({ tasks, setTasks, areas }) {
   const handleAddTask = (e) => {
@@ -50,7 +51,9 @@ function TaskManager({ tasks, setTasks, areas }) {
 
   return (
     <div className="glass-card">
-      <h2 style={{ color: 'var(--secondary-color)' }}>🧹 工作設定</h2>
+      <h2 style={{ color: 'var(--secondary-color)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Briefcase size={24} /> 工作設定
+      </h2>
       
       <div style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
         <h4 style={{ marginBottom: '0.5rem' }}>新增打掃工作</h4>
@@ -82,7 +85,9 @@ function TaskManager({ tasks, setTasks, areas }) {
             <option value="限男生">限男生</option>
             <option value="限女生">限女生</option>
           </select>
-          <button type="submit" className="btn btn-primary" style={{ gridColumn: '1 / -1' }}>新增工作</button>
+          <button type="submit" className="btn btn-primary" style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+            <ListPlus size={18} /> 新增工作
+          </button>
         </form>
       </div>
 
@@ -143,7 +148,9 @@ function TaskManager({ tasks, setTasks, areas }) {
                   </select>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>
-                  <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem' }} onClick={() => handleRemove(t.id)}>刪除</button>
+                  <button className="btn btn-danger" style={{ padding: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => handleRemove(t.id)} title="刪除">
+                    <Trash2 size={16} />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -151,7 +158,9 @@ function TaskManager({ tasks, setTasks, areas }) {
         </table>
         {tasks.length === 0 && (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 'var(--radius-md)', border: '1px dashed #ccc', marginTop: '1rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🧹</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', color: '#9ca3af' }}>
+              <CheckCircle2 size={48} strokeWidth={1.5} />
+            </div>
             <h4 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>目前還沒有設定工作項目！</h4>
             <p style={{ fontSize: '0.9rem' }}>您可以點擊上方「載入範例」快速建立，或是自行新增打掃工作。</p>
           </div>

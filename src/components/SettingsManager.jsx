@@ -1,4 +1,5 @@
 import React from 'react';
+import { Settings2 } from 'lucide-react';
 
 function SettingsManager({ settings, setSettings, students, setStudents, tasks, setTasks, areas, setAreas, showToast }) {
   const handleChange = (e) => {
@@ -9,7 +10,9 @@ function SettingsManager({ settings, setSettings, students, setStudents, tasks, 
   return (
     <div className="glass-card" style={{ gridColumn: '1 / -1', marginTop: '2rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ color: 'var(--primary-color)', margin: 0 }}>⚙️ 報表文字與備註設定</h2>
+        <h2 style={{ color: 'var(--primary-color)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Settings2 size={24} /> 報表文字與備註設定
+        </h2>
       </div>
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>

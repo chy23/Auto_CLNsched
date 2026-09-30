@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Tags, Plus, Trash2 } from 'lucide-react';
 
 function AreaManager({ areas, setAreas, students }) {
   const [newArea, setNewArea] = useState('');
@@ -33,7 +34,9 @@ function AreaManager({ areas, setAreas, students }) {
 
   return (
     <div className="glass-card">
-      <h2 style={{ color: 'var(--primary-color)' }}>🏷️ 掃區與股長管理</h2>
+      <h2 style={{ color: 'var(--primary-color)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Tags size={24} /> 掃區與股長管理
+      </h2>
       
       <div style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
         <h4 style={{ marginBottom: '0.5rem' }}>新增掃區</h4>
@@ -46,7 +49,9 @@ function AreaManager({ areas, setAreas, students }) {
             onChange={(e) => setNewArea(e.target.value)}
             required 
           />
-          <button type="submit" className="btn btn-primary">+</button>
+          <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>
+            <Plus size={20} />
+          </button>
         </form>
       </div>
 
@@ -101,7 +106,9 @@ function AreaManager({ areas, setAreas, students }) {
                   </select>
                 </td>
                 <td>
-                  <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem' }} onClick={() => handleRemoveArea(area.id)}>刪</button>
+                  <button className="btn btn-danger" style={{ padding: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => handleRemoveArea(area.id)} title="刪除">
+                    <Trash2 size={16} />
+                  </button>
                 </td>
               </tr>
             ))}

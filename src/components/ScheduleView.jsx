@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AlertTriangle, Printer, CalendarDays } from 'lucide-react';
 import * as XLSX from 'xlsx-js-style';
 
 function ScheduleView({ schedule, setSchedule, students, settings }) {
@@ -274,7 +275,7 @@ function ScheduleView({ schedule, setSchedule, students, settings }) {
           onDragLeave={(e) => handleDragLeave(e, 'unassigned')}
           onDrop={onDropToUnassigned}
         >
-          <h4 style={{ color: '#92400e', marginBottom: '0.5rem', marginTop: 0 }}>⚠️ 尚未分配工作的學生（備用名單）：</h4>
+          <h4 style={{ color: '#92400e', marginBottom: '0.5rem', marginTop: 0 }}><AlertTriangle size={18} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }} /> 尚未分配工作的學生（備用名單）：</h4>
           <p style={{ fontSize: '0.8rem', color: '#b45309', margin: '0 0 0.5rem 0' }}>💡 您可以將這裡的學生拖曳到下方的打掃範圍，或將下方的學生拖曳回這裡。</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             {unassignedStudents.map(s => {

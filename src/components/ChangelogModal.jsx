@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { X, History, Calendar } from 'lucide-react';
 import changelogData from '../changelog.json';
 
 function ChangelogModal({ isOpen, onClose }) {
@@ -19,15 +20,15 @@ function ChangelogModal({ isOpen, onClose }) {
           onClick={onClose}
           style={{
             position: 'absolute', top: '15px', right: '15px',
-            background: 'transparent', border: 'none', fontSize: '1.5rem',
+            background: 'transparent', border: 'none',
             cursor: 'pointer', color: 'var(--text-muted)'
           }}
         >
-          ✖
+          <X size={24} />
         </button>
         
-        <h2 style={{ color: 'var(--primary-color)', marginBottom: '1.5rem', borderBottom: '2px solid #e5e7eb', paddingBottom: '0.5rem' }}>
-          📜 系統更新紀錄 (Changelog)
+        <h2 style={{ color: 'var(--primary-color)', marginBottom: '1.5rem', borderBottom: '2px solid #e5e7eb', paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <History size={24} /> 系統更新紀錄 (Changelog)
         </h2>
 
         {changelogData && changelogData.length > 0 ? (
@@ -47,8 +48,8 @@ function ChangelogModal({ isOpen, onClose }) {
                     </span>
                     {log.title}
                   </h3>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 'bold' }}>
-                    📅 {log.date}
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Calendar size={16} /> {log.date}
                   </span>
                 </div>
                 

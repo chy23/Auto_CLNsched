@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import * as XLSX from 'xlsx-js-style';
+import { Users, FileSpreadsheet, GraduationCap, Plus, Trash2, UserPlus, Upload } from 'lucide-react';
 
 function StudentManager({ students, setStudents }) {
   const [inputData, setInputData] = useState('');
@@ -101,14 +102,18 @@ function StudentManager({ students, setStudents }) {
 
   return (
     <div className="glass-card">
-      <h2 style={{ color: 'var(--primary-color)' }}>👥 學生名單管理</h2>
+      <h2 style={{ color: 'var(--primary-color)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <Users size={24} /> 學生名單管理
+      </h2>
       
       <div style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.5)', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
-        <h4 style={{ marginBottom: '0.5rem' }}>Excel / 批次匯入</h4>
+        <h4 style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <FileSpreadsheet size={18} /> Excel / 批次匯入
+        </h4>
         
         <div style={{ marginBottom: '1rem' }}>
-          <label className="btn btn-secondary" style={{ width: '100%', cursor: 'pointer' }}>
-            📁 點擊上傳 Excel 檔案 (.xlsx, .csv)
+          <label className="btn btn-secondary" style={{ width: '100%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+            <Upload size={18} /> 點擊上傳 Excel 檔案 (.xlsx, .csv)
             <input 
               type="file" 
               accept=".xlsx, .xls, .csv" 
@@ -131,7 +136,9 @@ function StudentManager({ students, setStudents }) {
         <button className="btn btn-secondary" onClick={handleBulkImport}>文字匯入名單</button>
       </div>
 
-      <h2 style={{ color: 'var(--primary-color)' }}>🧑‍🎓 學生名單</h2>
+      <h2 style={{ color: 'var(--primary-color)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <GraduationCap size={24} /> 學生名單
+      </h2>
       
       <div style={{ marginBottom: '1.5rem' }}>
         <form onSubmit={handleAddRow} style={{ display: 'flex', gap: '0.5rem' }}>
@@ -145,14 +152,18 @@ function StudentManager({ students, setStudents }) {
             <option value="早到">早到</option>
             <option value="晚到">晚到</option>
           </select>
-          <button type="submit" className="btn btn-primary">+</button>
+          <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>
+            <Plus size={20} />
+          </button>
         </form>
       </div>
 
       <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
         {students.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 'var(--radius-md)', border: '1px dashed #ccc' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👋</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', color: '#9ca3af' }}>
+              <UserPlus size={48} strokeWidth={1.5} />
+            </div>
             <h4 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>目前還沒有學生名單喔！</h4>
             <p style={{ fontSize: '0.9rem' }}>請在上方輸入座號與姓名，開始建立您的班級名單。</p>
           </div>
@@ -181,7 +192,9 @@ function StudentManager({ students, setStudents }) {
                     <option value="晚到">晚到</option>
                   </select>
                 </div>
-                <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem', alignSelf: 'center' }} onClick={() => handleRemove(student.id)}>刪除</button>
+                <button className="btn btn-danger" style={{ padding: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => handleRemove(student.id)} title="刪除">
+                  <Trash2 size={16} />
+                </button>
               </div>
             ))}
           </div>
