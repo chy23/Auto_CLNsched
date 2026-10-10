@@ -44,6 +44,15 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1rem;
 }
 
+h1 {
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h2, h3 {
+  letter-spacing: -0.01em;
+}
+
 /* App Card (formerly glass-card) */
 .glass-card {
   background: #ffffff;
@@ -85,6 +94,11 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+}
+
+.btn:active {
+  transform: scale(0.96);
+  transition: transform 50ms ease-out;
 }
 
 .btn-secondary {
@@ -296,5 +310,29 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 768px) {
   .grid-2 {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Accessibility: Reduced Motion & Transparency */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-fade-in {
+    animation: none;
+    opacity: 1;
+  }
+  .glass-card:hover, .btn-primary:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-card {
+    background: white;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid #e5e7eb;
   }
 }
